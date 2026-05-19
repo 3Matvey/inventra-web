@@ -1,6 +1,15 @@
 import { http } from "@/shared/api/http";
 import type { PagedResult } from "@/shared/types/common";
-import type { InventorySearchParams, InventoryTableRowDto, TagCloudItemDto } from "./types";
+import type {
+  InventoryDetailsDto,
+  InventorySearchParams,
+  InventoryTableRowDto,
+  TagCloudItemDto
+} from "./types";
+
+export function getInventoryDetails(inventoryId: string) {
+  return http.get<InventoryDetailsDto>(`/inventories/${inventoryId}`);
+}
 
 export function getLatestInventories(page = 1, pageSize = 10) {
   return http.get<PagedResult<InventoryTableRowDto>>("/inventories/latest", {

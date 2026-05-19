@@ -137,6 +137,129 @@ a {
   gap: 0.75rem;
 }
 
+.inventory-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.inventory-image {
+  width: 100%;
+  max-height: 18rem;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.inventory-summary {
+  display: grid;
+  gap: 0.8rem;
+  align-content: center;
+}
+
+.inventory-heading-line {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.inventory-summary h1 {
+  margin: 0;
+  font-size: clamp(2rem, 6vw, 3.25rem);
+  line-height: 1.05;
+}
+
+.inventory-description {
+  max-width: 68rem;
+  margin: 0;
+  color: var(--p-surface-600);
+  font-size: 1.05rem;
+  line-height: 1.55;
+}
+
+.app-dark .inventory-description {
+  color: var(--p-surface-300);
+}
+
+.inventory-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem 1rem;
+  color: var(--p-surface-600);
+}
+
+.app-dark .inventory-meta {
+  color: var(--p-surface-300);
+}
+
+.inventory-meta span {
+  display: inline-flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.table-with-toolbar {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.toolbar-selection {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.info-grid > div,
+.stat-tile {
+  display: grid;
+  gap: 0.35rem;
+  min-height: 5rem;
+  align-content: center;
+  padding: 1rem;
+  border: 1px solid var(--p-surface-200);
+  border-radius: 8px;
+  background: var(--p-surface-0);
+}
+
+.app-dark .info-grid > div,
+.app-dark .stat-tile {
+  border-color: var(--p-surface-800);
+  background: var(--p-surface-900);
+}
+
+.definition-list,
+.stats-layout {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.definition-row {
+  display: grid;
+  grid-template-columns: minmax(10rem, 18rem) minmax(0, 1fr);
+  gap: 1rem;
+  align-items: center;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--p-surface-200);
+  border-radius: 8px;
+  background: var(--p-surface-0);
+}
+
+.app-dark .definition-row {
+  border-color: var(--p-surface-800);
+  background: var(--p-surface-900);
+}
+
+.stat-tile strong {
+  font-size: 2rem;
+}
+
 .muted {
   color: var(--p-surface-500);
 }
@@ -194,6 +317,14 @@ a {
   .page-heading {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .definition-row {
+    grid-template-columns: 1fr;
   }
 
   .header-actions .p-button-label {
