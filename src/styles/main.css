@@ -235,9 +235,16 @@ a {
 }
 
 .definition-list,
-.stats-layout {
+.stats-layout,
+.manager-stack {
   display: grid;
   gap: 0.75rem;
+}
+
+.field-limit-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
 }
 
 .item-details {
@@ -271,7 +278,8 @@ a {
   display: block;
 }
 
-.definition-row {
+.definition-row,
+.field-editor-row {
   display: grid;
   grid-template-columns: minmax(10rem, 18rem) minmax(0, 1fr);
   gap: 1rem;
@@ -282,7 +290,23 @@ a {
   background: var(--p-surface-0);
 }
 
-.app-dark .definition-row {
+.field-editor-row {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.field-editor-main {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.row-action-group {
+  display: inline-flex;
+  gap: 0.15rem;
+  align-items: center;
+}
+
+.app-dark .definition-row,
+.app-dark .field-editor-row {
   border-color: var(--p-surface-800);
   background: var(--p-surface-900);
 }
@@ -354,8 +378,13 @@ a {
     grid-template-columns: 1fr;
   }
 
-  .definition-row {
+  .definition-row,
+  .field-editor-row {
     grid-template-columns: 1fr;
+  }
+
+  .row-action-group {
+    justify-content: flex-start;
   }
 
   .header-actions .p-button-label {

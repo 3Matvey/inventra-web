@@ -12,11 +12,11 @@ import { getInventoryItems, getInventoryStatistics } from "@/entities/item/api";
 import type { InventoryDetailsDto } from "@/entities/inventory/types";
 import type { InventoryItemTableRowDto, InventoryStatisticsDto } from "@/entities/item/types";
 import InventoryAccessSummary from "@/features/inventory-details/components/InventoryAccessSummary.vue";
-import InventoryFieldsSummary from "@/features/inventory-details/components/InventoryFieldsSummary.vue";
 import InventoryHero from "@/features/inventory-details/components/InventoryHero.vue";
 import InventoryIdFormatSummary from "@/features/inventory-details/components/InventoryIdFormatSummary.vue";
 import InventorySettingsSummary from "@/features/inventory-details/components/InventorySettingsSummary.vue";
 import InventoryStatisticsPanel from "@/features/inventory-details/components/InventoryStatisticsPanel.vue";
+import FieldsManager from "@/features/inventory-fields/components/FieldsManager.vue";
 import ItemCreateDialog from "@/features/item-editor/components/ItemCreateDialog.vue";
 
 const props = defineProps<{
@@ -102,6 +102,10 @@ async function handleItemCreated() {
   return stats;
 }
 
+function handleInventoryUpdated(nextInventory: InventoryDetailsDto) {
+  inventory.value = nextInventory;
+}
+
 onMounted(loadInventory);
 </script>
 
@@ -166,7 +170,7 @@ onMounted(loadInventory);
         </TabPanel>
 
         <TabPanel value="fields">
-          <InventoryFieldsSummary :inventory="inventory" />
+          <FieldsManager :inventory="inventory" @updated="handleInventoryUpdated" />
         </TabPanel>
 
         <TabPanel value="statistics">
