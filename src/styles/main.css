@@ -459,6 +459,16 @@ a {
   align-items: center;
 }
 
+.field-editor-row .row-action-group {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.field-editor-row:hover .row-action-group,
+.field-editor-row:focus-within .row-action-group {
+  opacity: 1;
+}
+
 .app-dark .definition-row,
 .app-dark .field-editor-row {
   border-color: var(--p-surface-800);
@@ -489,7 +499,17 @@ a {
   width: fit-content;
   max-width: 100%;
   padding: 0;
+  border: 0;
+  color: var(--p-primary-color);
+  font: inherit;
+  font-weight: 700;
   text-align: left;
+  text-decoration: none;
+}
+
+.link-button:hover,
+.link-button:focus-visible {
+  text-decoration: underline;
 }
 
 .tag-list,
@@ -539,6 +559,10 @@ a {
 
   .row-action-group {
     justify-content: flex-start;
+  }
+
+  .field-editor-row .row-action-group {
+    opacity: 1;
   }
 
   .access-panel,

@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import Button from "primevue/button";
 import Column from "primevue/column";
 import DataTable from "primevue/datatable";
 import Tag from "primevue/tag";
-import { useRouter } from "vue-router";
+import { RouterLink, useRouter } from "vue-router";
 import { formatDateTime } from "@/shared/utils/date";
 import type { InventoryTableRowDto } from "../types";
 
@@ -35,12 +34,13 @@ function openInventory(inventory: InventoryTableRowDto) {
     <Column field="title" header="Inventory" sortable>
       <template #body="{ data }">
         <div class="table-primary-cell">
-          <Button
+          <RouterLink
             class="link-button"
-            link
-            :label="data.title"
+            :to="{ name: 'inventory', params: { inventoryId: data.id } }"
             @click.stop="openInventory(data)"
-          />
+          >
+            {{ data.title }}
+          </RouterLink>
           <span v-if="data.descriptionMarkdown" class="muted ellipsis">
             {{ data.descriptionMarkdown }}
           </span>

@@ -31,6 +31,7 @@ const { t } = useI18n();
 const sortMode = ref<"name" | "email">("name");
 const userDraft = ref<string | AutocompleteOptionDto>("");
 const userSuggestions = ref<AutocompleteOptionDto[]>([]);
+const selectedUsers = ref<InventoryAccessUserDto[]>([]);
 const loading = ref(false);
 const errorMessage = ref<string | null>(null);
 
@@ -89,12 +90,18 @@ async function grantAccess(value = userDraft.value) {
   }
 }
 
-async function revokeAccess(user: InventoryAccessUserDto) {
+async function revokeSelectedAccess() {
+  const users = [...selectedUsers.value];
+  if (users.length === 0) return;
+
   loading.value = true;
   errorMessage.value = null;
 
   try {
-    await revokeInventoryAccess(props.inventory.id, user.userId, props.inventory.version);
+    await Promise.all(
+      users.map((user) => revokeInventoryAccess(props.inventory.id, user.userId, props.inventory.version))
+    );
+    selectedUsers.value = [];
     await reloadInventory();
   } catch (error) {
     errorMessage.value = error instanceof Error ? error.message : "Failed to revoke access.";
@@ -130,7 +137,17 @@ async function revokeAccess(user: InventoryAccessUserDto) {
           <h2>{{ t("access.individual") }}</h2>
           <span class="muted">{{ t("access.individualHint") }}</span>
         </div>
-        <SelectButton v-model="sortMode" :options="sortOptions" option-label="label" option-value="value" />
+        <div class="row-action-group">
+          <SelectButton v-model="sortMode" :options="sortOptions" option-label="label" option-value="value" />
+          <Button
+            icon="pi pi-times"
+            label="Revoke selected"
+            severity="danger"
+            outlined
+            :disabled="selectedUsers.length === 0 || loading"
+            @click="revokeSelectedAccess"
+          />
+        </div>
       </div>
 
       <div class="grant-row">
@@ -152,25 +169,19 @@ async function revokeAccess(user: InventoryAccessUserDto) {
         <Button icon="pi pi-plus" :label="t('access.grant')" :loading="loading" @click="grantAccess()" />
       </div>
 
-      <DataTable :value="sortedUsers" data-key="userId" striped-rows table-style="min-width: 42rem">
+      <DataTable
+        v-model:selection="selectedUsers"
+        :value="sortedUsers"
+        data-key="userId"
+        striped-rows
+        table-style="min-width: 42rem"
+      >
         <template #empty>No individual access grants.</template>
+        <Column selection-mode="multiple" header-style="width: 3rem" />
         <Column field="userName" :header="t('common.name')" sortable />
         <Column field="email" :header="t('common.email')" sortable />
         <Column field="grantedAt" header="Granted" sortable>
           <template #body="{ data }">{{ formatDateTime(data.grantedAt) }}</template>
-        </Column>
-        <Column header="">
-          <template #body="{ data }">
-            <Button
-              text
-              rounded
-              severity="danger"
-              icon="pi pi-times"
-              aria-label="Revoke access"
-              :disabled="loading"
-              @click="revokeAccess(data)"
-            />
-          </template>
         </Column>
       </DataTable>
     </section>

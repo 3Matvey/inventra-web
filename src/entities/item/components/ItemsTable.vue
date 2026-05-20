@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { useRouter } from "vue-router";
+import { RouterLink, useRouter } from "vue-router";
 import Button from "primevue/button";
 import Column from "primevue/column";
 import DataTable, { type DataTablePageEvent, type DataTableSortEvent } from "primevue/datatable";
@@ -119,12 +119,13 @@ function editSelected() {
       <Column selection-mode="multiple" header-style="width: 3rem" />
       <Column field="customId" header="Custom ID" sortable>
         <template #body="{ data }">
-          <Button
+          <RouterLink
             class="link-button"
-            link
-            :label="data.customId"
+            :to="{ name: 'item', params: { itemId: data.id } }"
             @click.stop="openItem(data)"
-          />
+          >
+            {{ data.customId }}
+          </RouterLink>
         </template>
       </Column>
       <Column field="createdByUserName" header="Created by" sortable />

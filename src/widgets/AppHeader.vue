@@ -100,6 +100,14 @@ onMounted(async () => {
       />
       <Button text rounded :label="locale.toUpperCase()" aria-label="Language" @click="toggleLocale" />
       <Button
+        v-if="currentUser.isAdmin"
+        text
+        rounded
+        icon="pi pi-shield"
+        :label="t('app.adminUsers')"
+        @click="router.push({ name: 'admin-users' })"
+      />
+      <Button
         v-if="currentUser.user"
         text
         icon="pi pi-user"
