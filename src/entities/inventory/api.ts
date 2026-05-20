@@ -177,6 +177,18 @@ export function searchInventories(params: InventorySearchParams) {
   });
 }
 
+export function getOwnedInventories(ownerId: string, page = 1, pageSize = 20) {
+  return http.get<PagedResult<InventoryTableRowDto>>(`/inventories/owned/${ownerId}`, {
+    query: { page, pageSize }
+  });
+}
+
+export function getWritableInventories(userId: string, page = 1, pageSize = 20) {
+  return http.get<PagedResult<InventoryTableRowDto>>(`/inventories/writable/${userId}`, {
+    query: { page, pageSize }
+  });
+}
+
 export function getTagCloud(count = 50) {
   return http.get<TagCloudItemDto[]>("/tags/cloud", {
     query: { count }

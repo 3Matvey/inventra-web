@@ -21,7 +21,9 @@ const accountMenuItems = computed<MenuItem[]>(() => {
     {
       label: "Profile",
       icon: "pi pi-user",
-      command: () => undefined
+      command: () => {
+        void router.push({ name: "profile" });
+      }
     }
   ];
 
