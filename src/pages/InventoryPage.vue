@@ -11,10 +11,10 @@ import { getInventoryDetails } from "@/entities/inventory/api";
 import { getInventoryItems, getInventoryStatistics } from "@/entities/item/api";
 import type { InventoryDetailsDto } from "@/entities/inventory/types";
 import type { InventoryItemTableRowDto, InventoryStatisticsDto } from "@/entities/item/types";
-import InventoryAccessSummary from "@/features/inventory-details/components/InventoryAccessSummary.vue";
 import InventoryHero from "@/features/inventory-details/components/InventoryHero.vue";
 import InventorySettingsSummary from "@/features/inventory-details/components/InventorySettingsSummary.vue";
 import InventoryStatisticsPanel from "@/features/inventory-details/components/InventoryStatisticsPanel.vue";
+import AccessManager from "@/features/inventory-access/components/AccessManager.vue";
 import FieldsManager from "@/features/inventory-fields/components/FieldsManager.vue";
 import IdFormatManager from "@/features/inventory-id-format/components/IdFormatManager.vue";
 import ItemCreateDialog from "@/features/item-editor/components/ItemCreateDialog.vue";
@@ -166,7 +166,7 @@ onMounted(loadInventory);
         </TabPanel>
 
         <TabPanel value="access">
-          <InventoryAccessSummary :inventory="inventory" />
+          <AccessManager :inventory="inventory" @updated="handleInventoryUpdated" />
         </TabPanel>
 
         <TabPanel value="fields">

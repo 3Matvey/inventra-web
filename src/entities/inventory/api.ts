@@ -112,6 +112,34 @@ export function reorderInventoryIdFormatElements(
   });
 }
 
+export function setInventoryPublicWriteAccess(
+  inventoryId: string,
+  expectedVersion: number,
+  isPublic: boolean
+) {
+  return http.put<void>(`/inventories/${inventoryId}/public-access`, {
+    expectedVersion,
+    isPublic
+  });
+}
+
+export function grantInventoryAccess(
+  inventoryId: string,
+  expectedVersion: number,
+  userNameOrEmail: string
+) {
+  return http.post<string>(`/inventories/${inventoryId}/access-grants`, {
+    expectedVersion,
+    userNameOrEmail
+  });
+}
+
+export function revokeInventoryAccess(inventoryId: string, userId: string, expectedVersion: number) {
+  return http.delete<void>(`/inventories/${inventoryId}/access-grants/${userId}`, {
+    query: { expectedVersion }
+  });
+}
+
 export function getLatestInventories(page = 1, pageSize = 10) {
   return http.get<PagedResult<InventoryTableRowDto>>("/inventories/latest", {
     query: { page, pageSize }

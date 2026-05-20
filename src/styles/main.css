@@ -267,6 +267,38 @@ a {
   font-size: 1.35rem;
 }
 
+.access-panel {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border: 1px solid var(--p-surface-200);
+  border-radius: 8px;
+  background: var(--p-surface-0);
+}
+
+.app-dark .access-panel {
+  border-color: var(--p-surface-800);
+  background: var(--p-surface-900);
+}
+
+.access-panel h2,
+.access-panel p {
+  margin: 0;
+}
+
+.grant-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.5rem;
+}
+
+.autocomplete-option {
+  display: grid;
+  gap: 0.15rem;
+}
+
 .item-details {
   display: grid;
   gap: 1.25rem;
@@ -405,6 +437,13 @@ a {
 
   .row-action-group {
     justify-content: flex-start;
+  }
+
+  .access-panel,
+  .grant-row {
+    align-items: stretch;
+    grid-template-columns: 1fr;
+    flex-direction: column;
   }
 
   .header-actions .p-button-label {
