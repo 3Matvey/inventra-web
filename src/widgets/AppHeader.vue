@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import Button from "primevue/button";
 import InputText from "primevue/inputtext";
@@ -16,20 +16,35 @@ const isDark = ref(localStorage.getItem("inventra.theme") === "dark");
 const signInVisible = ref(false);
 const accountMenu = ref<InstanceType<typeof Menu> | null>(null);
 
-const accountMenuItems: MenuItem[] = [
-  {
-    label: "Profile",
-    icon: "pi pi-user",
-    command: () => undefined
-  },
-  {
+const accountMenuItems = computed<MenuItem[]>(() => {
+  const items: MenuItem[] = [
+    {
+      label: "Profile",
+      icon: "pi pi-user",
+      command: () => undefined
+    }
+  ];
+
+  if (currentUser.isAdmin) {
+    items.push({
+      label: "Admin users",
+      icon: "pi pi-shield",
+      command: () => {
+        void router.push({ name: "admin-users" });
+      }
+    });
+  }
+
+  items.push({
     label: "Sign out",
     icon: "pi pi-sign-out",
     command: () => {
       void currentUser.signOut();
     }
-  }
-];
+  });
+
+  return items;
+});
 
 function applyTheme() {
   document.documentElement.classList.toggle("app-dark", isDark.value);

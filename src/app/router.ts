@@ -19,6 +19,11 @@ export const router = createRouter({
       component: () => import("@/pages/SignInPage.vue")
     },
     {
+      path: "/admin/users",
+      name: "admin-users",
+      component: () => import("@/pages/AdminUsersPage.vue")
+    },
+    {
       path: "/inventories/:inventoryId",
       name: "inventory",
       component: () => import("@/pages/InventoryPage.vue"),
