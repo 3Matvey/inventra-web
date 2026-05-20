@@ -1,5 +1,6 @@
 import { http } from "@/shared/api/http";
 import type { Guid } from "@/shared/types/common";
+import { uploadInventoryImage, type UploadedImageDto } from "@/features/inventory-settings/api";
 
 export type CreateInventoryRequest = {
   categoryId: Guid;
@@ -10,20 +11,8 @@ export type CreateInventoryRequest = {
   tags: string[];
 };
 
-export type UploadedImageDto = {
-  url: string;
-  publicId: string;
-  contentType: string;
-  size: number;
-};
-
 export function createInventory(request: CreateInventoryRequest) {
   return http.post<Guid>("/inventories", request);
 }
 
-export function uploadInventoryImage(file: File) {
-  const formData = new FormData();
-  formData.set("file", file);
-
-  return http.post<UploadedImageDto>("/uploads/images", formData);
-}
+export { uploadInventoryImage, type UploadedImageDto };

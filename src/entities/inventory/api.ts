@@ -123,6 +123,19 @@ export function setInventoryPublicWriteAccess(
   });
 }
 
+export type UpdateInventorySettingsRequest = {
+  expectedVersion: number;
+  categoryId: string;
+  title: string;
+  descriptionMarkdown: string | null;
+  imageUrl: string | null;
+  imagePublicId: string | null;
+};
+
+export function updateInventorySettings(inventoryId: string, request: UpdateInventorySettingsRequest) {
+  return http.put<void>(`/inventories/${inventoryId}/settings`, request);
+}
+
 export function grantInventoryAccess(
   inventoryId: string,
   expectedVersion: number,

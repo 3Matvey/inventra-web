@@ -294,6 +294,49 @@ a {
   gap: 0.5rem;
 }
 
+.settings-save-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.form-stack,
+.field-stack {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.dialog-actions,
+.upload-row,
+.tag-input-row,
+.checkbox-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.dialog-actions {
+  justify-content: flex-end;
+}
+
+.upload-preview {
+  width: 5rem;
+  height: 5rem;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.clickable-tag {
+  cursor: pointer;
+}
+
 .autocomplete-option {
   display: grid;
   gap: 0.15rem;
@@ -440,7 +483,8 @@ a {
   }
 
   .access-panel,
-  .grant-row {
+  .grant-row,
+  .form-grid {
     align-items: stretch;
     grid-template-columns: 1fr;
     flex-direction: column;
