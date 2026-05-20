@@ -13,6 +13,8 @@ defineProps<{
 
 const emit = defineEmits<{
   toggleLike: [];
+  edit: [];
+  delete: [];
 }>();
 </script>
 
@@ -23,12 +25,16 @@ const emit = defineEmits<{
         <p class="eyebrow">Item</p>
         <h1>{{ item.customId }}</h1>
       </div>
-      <Button
-        :icon="item.isLikedByCurrentUser ? 'pi pi-heart-fill' : 'pi pi-heart'"
-        :label="`${item.likesCount} likes`"
-        :loading="likeLoading"
-        @click="emit('toggleLike')"
-      />
+      <div class="row-action-group">
+        <Button icon="pi pi-pencil" label="Edit" outlined @click="emit('edit')" />
+        <Button icon="pi pi-trash" label="Delete" severity="danger" outlined @click="emit('delete')" />
+        <Button
+          :icon="item.isLikedByCurrentUser ? 'pi pi-heart-fill' : 'pi pi-heart'"
+          :label="`${item.likesCount} likes`"
+          :loading="likeLoading"
+          @click="emit('toggleLike')"
+        />
+      </div>
     </div>
 
     <div class="info-grid">

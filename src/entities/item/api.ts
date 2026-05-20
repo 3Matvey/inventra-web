@@ -40,3 +40,22 @@ export function createInventoryItem(inventoryId: string, fieldValues: ItemFieldV
     fieldValues
   });
 }
+
+export function updateInventoryItem(
+  itemId: string,
+  expectedVersion: number,
+  customId: string,
+  fieldValues: ItemFieldValueRequest[]
+) {
+  return http.put<void>(`/items/${itemId}`, {
+    expectedVersion,
+    customId,
+    fieldValues
+  });
+}
+
+export function deleteInventoryItem(itemId: string, expectedVersion: number) {
+  return http.delete<void>(`/items/${itemId}`, {
+    query: { expectedVersion }
+  });
+}

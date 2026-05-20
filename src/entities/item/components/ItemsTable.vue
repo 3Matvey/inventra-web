@@ -22,6 +22,8 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   add: [];
+  edit: [item: InventoryItemTableRowDto];
+  delete: [items: InventoryItemTableRowDto[]];
   page: [page: number, pageSize: number];
   sort: [sortBy: string | null, sortDescending: boolean];
 }>();
@@ -58,6 +60,11 @@ function handlePage(event: DataTablePageEvent) {
 function handleSort(event: DataTableSortEvent) {
   emit("sort", String(event.sortField ?? "") || null, event.sortOrder === -1);
 }
+
+function editSelected() {
+  const [item] = selectedItems.value;
+  if (item) emit("edit", item);
+}
 </script>
 
 <template>
@@ -71,11 +78,19 @@ function handleSort(event: DataTableSortEvent) {
       <template #end>
         <Button icon="pi pi-plus" label="Add item" @click="emit('add')" />
         <Button
+          icon="pi pi-pencil"
+          label="Edit selected"
+          outlined
+          :disabled="selectedItems.length !== 1"
+          @click="editSelected"
+        />
+        <Button
           icon="pi pi-trash"
           label="Delete selected"
           severity="danger"
           outlined
           :disabled="selectedItems.length === 0"
+          @click="emit('delete', selectedItems)"
         />
       </template>
     </Toolbar>

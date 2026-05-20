@@ -8,9 +8,18 @@ import TabPanels from "primevue/tabpanels";
 import Tabs from "primevue/tabs";
 import ItemsTable from "@/entities/item/components/ItemsTable.vue";
 import { getInventoryDetails } from "@/entities/inventory/api";
-import { getInventoryItems, getInventoryStatistics } from "@/entities/item/api";
+import {
+  deleteInventoryItem,
+  getInventoryItems,
+  getInventoryStatistics,
+  getItemDetails
+} from "@/entities/item/api";
 import type { InventoryDetailsDto } from "@/entities/inventory/types";
-import type { InventoryItemTableRowDto, InventoryStatisticsDto } from "@/entities/item/types";
+import type {
+  InventoryItemDetailsDto,
+  InventoryItemTableRowDto,
+  InventoryStatisticsDto
+} from "@/entities/item/types";
 import DiscussionTab from "@/features/comments/components/DiscussionTab.vue";
 import InventoryHero from "@/features/inventory-details/components/InventoryHero.vue";
 import InventoryStatisticsPanel from "@/features/inventory-details/components/InventoryStatisticsPanel.vue";
@@ -19,6 +28,7 @@ import FieldsManager from "@/features/inventory-fields/components/FieldsManager.
 import IdFormatManager from "@/features/inventory-id-format/components/IdFormatManager.vue";
 import InventorySettingsForm from "@/features/inventory-settings/components/InventorySettingsForm.vue";
 import ItemCreateDialog from "@/features/item-editor/components/ItemCreateDialog.vue";
+import ItemEditorDialog from "@/features/item-editor/components/ItemEditorDialog.vue";
 
 const props = defineProps<{
   inventoryId: string;
@@ -36,6 +46,8 @@ const loading = ref(true);
 const itemsLoading = ref(false);
 const errorMessage = ref<string | null>(null);
 const itemCreateVisible = ref(false);
+const itemEditVisible = ref(false);
+const editingItem = ref<InventoryItemDetailsDto | null>(null);
 
 async function loadInventory() {
   loading.value = true;
@@ -103,6 +115,34 @@ async function handleItemCreated() {
   return stats;
 }
 
+async function handleItemEditRequested(item: InventoryItemTableRowDto) {
+  itemsLoading.value = true;
+  errorMessage.value = null;
+
+  try {
+    editingItem.value = await getItemDetails(item.id);
+    itemEditVisible.value = true;
+  } catch (error) {
+    errorMessage.value = error instanceof Error ? error.message : "Failed to load item for editing.";
+  } finally {
+    itemsLoading.value = false;
+  }
+}
+
+async function handleItemsDeleteRequested(selectedItems: InventoryItemTableRowDto[]) {
+  itemsLoading.value = true;
+  errorMessage.value = null;
+
+  try {
+    await Promise.all(selectedItems.map((item) => deleteInventoryItem(item.id, item.version)));
+    await handleItemCreated();
+  } catch (error) {
+    errorMessage.value = error instanceof Error ? error.message : "Failed to delete selected items.";
+  } finally {
+    itemsLoading.value = false;
+  }
+}
+
 function handleInventoryUpdated(nextInventory: InventoryDetailsDto) {
   inventory.value = nextInventory;
 }
@@ -147,6 +187,8 @@ onMounted(loadInventory);
             :page="itemsPage"
             :page-size="itemsPageSize"
             @add="itemCreateVisible = true"
+            @edit="handleItemEditRequested"
+            @delete="handleItemsDeleteRequested"
             @page="handleItemsPage"
             @sort="handleItemsSort"
           />
@@ -184,6 +226,16 @@ onMounted(loadInventory);
       :inventory-id="inventory.id"
       :fields="inventory.fields"
       @created="handleItemCreated"
+    />
+
+    <ItemEditorDialog
+      v-if="inventory && editingItem"
+      v-model:visible="itemEditVisible"
+      mode="edit"
+      :inventory-id="inventory.id"
+      :fields="inventory.fields"
+      :item="editingItem"
+      @saved="handleItemCreated"
     />
   </div>
 </template>
