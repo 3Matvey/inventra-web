@@ -11,6 +11,7 @@ import { getInventoryDetails } from "@/entities/inventory/api";
 import { getInventoryItems, getInventoryStatistics } from "@/entities/item/api";
 import type { InventoryDetailsDto } from "@/entities/inventory/types";
 import type { InventoryItemTableRowDto, InventoryStatisticsDto } from "@/entities/item/types";
+import DiscussionTab from "@/features/comments/components/DiscussionTab.vue";
 import InventoryHero from "@/features/inventory-details/components/InventoryHero.vue";
 import InventoryStatisticsPanel from "@/features/inventory-details/components/InventoryStatisticsPanel.vue";
 import AccessManager from "@/features/inventory-access/components/AccessManager.vue";
@@ -152,9 +153,7 @@ onMounted(loadInventory);
         </TabPanel>
 
         <TabPanel value="discussion">
-          <Message severity="info" :closable="false">
-            Discussion with near-real-time updates will be connected to the inventory hub here.
-          </Message>
+          <DiscussionTab :inventory-id="inventory.id" />
         </TabPanel>
 
         <TabPanel value="settings">

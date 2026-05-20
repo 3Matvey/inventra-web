@@ -342,6 +342,52 @@ a {
   gap: 0.15rem;
 }
 
+.comment-list,
+.comment-composer {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.comment-card {
+  display: grid;
+  gap: 0.65rem;
+  padding: 1rem;
+  border: 1px solid var(--p-surface-200);
+  border-radius: 8px;
+  background: var(--p-surface-0);
+}
+
+.app-dark .comment-card {
+  border-color: var(--p-surface-800);
+  background: var(--p-surface-900);
+}
+
+.comment-card header {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.markdown-body {
+  line-height: 1.55;
+}
+
+.markdown-body p,
+.markdown-body ul,
+.markdown-body ol {
+  margin: 0 0 0.75rem;
+}
+
+.markdown-body :last-child {
+  margin-bottom: 0;
+}
+
+.markdown-body a {
+  color: var(--p-primary-600);
+  text-decoration: underline;
+}
+
 .item-details {
   display: grid;
   gap: 1.25rem;
