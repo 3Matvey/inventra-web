@@ -14,6 +14,11 @@ export const router = createRouter({
       component: () => import("@/pages/SearchPage.vue")
     },
     {
+      path: "/sign-in",
+      name: "sign-in",
+      component: () => import("@/pages/SignInPage.vue")
+    },
+    {
       path: "/inventories/:inventoryId",
       name: "inventory",
       component: () => import("@/pages/InventoryPage.vue"),

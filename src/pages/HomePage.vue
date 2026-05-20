@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 import Message from "primevue/message";
 import Tag from "primevue/tag";
 import Button from "primevue/button";
 import InventoryTable from "@/entities/inventory/components/InventoryTable.vue";
+import CreateInventoryDialog from "@/features/inventory-create/components/CreateInventoryDialog.vue";
 import {
   getLatestInventories,
   getTagCloud,
@@ -11,13 +13,18 @@ import {
 } from "@/entities/inventory/api";
 import type { InventoryTableRowDto, TagCloudItemDto } from "@/entities/inventory/types";
 
+const router = useRouter();
 const latest = ref<InventoryTableRowDto[]>([]);
 const top = ref<InventoryTableRowDto[]>([]);
 const tags = ref<TagCloudItemDto[]>([]);
 const loading = ref(true);
 const errorMessage = ref<string | null>(null);
+const createDialogVisible = ref(false);
 
-onMounted(async () => {
+async function loadHome() {
+  loading.value = true;
+  errorMessage.value = null;
+
   try {
     const [latestResult, topResult, tagCloudResult] = await Promise.all([
       getLatestInventories(1, 10),
@@ -33,7 +40,13 @@ onMounted(async () => {
   } finally {
     loading.value = false;
   }
-});
+}
+
+function handleInventoryCreated(inventoryId: string) {
+  void router.push({ name: "inventory", params: { inventoryId } });
+}
+
+onMounted(loadHome);
 </script>
 
 <template>
@@ -43,7 +56,7 @@ onMounted(async () => {
         <p class="eyebrow">Inventory management</p>
         <h1>Inventories</h1>
       </div>
-      <Button icon="pi pi-plus" label="Create inventory" />
+      <Button icon="pi pi-plus" label="Create inventory" @click="createDialogVisible = true" />
     </section>
 
     <Message v-if="errorMessage" severity="error" :closable="false">
@@ -84,5 +97,10 @@ onMounted(async () => {
         <span v-if="!loading && tags.length === 0" class="muted">No tags yet.</span>
       </div>
     </section>
+
+    <CreateInventoryDialog
+      v-model:visible="createDialogVisible"
+      @created="handleInventoryCreated"
+    />
   </div>
 </template>

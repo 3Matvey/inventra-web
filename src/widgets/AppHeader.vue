@@ -3,16 +3,33 @@ import { onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import Button from "primevue/button";
 import InputText from "primevue/inputtext";
-import { ApiError } from "@/shared/api/errors";
-import { getCurrentUser } from "@/entities/user/api";
-import type { UserProfileResponse } from "@/entities/user/types";
+import Menu from "primevue/menu";
+import type { MenuItem } from "primevue/menuitem";
+import SignInDialog from "@/features/auth/components/SignInDialog.vue";
+import { useCurrentUserStore } from "@/entities/user/stores/currentUser";
 
 const router = useRouter();
 const route = useRoute();
+const currentUser = useCurrentUserStore();
 const searchTerm = ref(typeof route.query.term === "string" ? route.query.term : "");
-const user = ref<UserProfileResponse | null>(null);
-const authChecked = ref(false);
 const isDark = ref(localStorage.getItem("inventra.theme") === "dark");
+const signInVisible = ref(false);
+const accountMenu = ref<InstanceType<typeof Menu> | null>(null);
+
+const accountMenuItems: MenuItem[] = [
+  {
+    label: "Profile",
+    icon: "pi pi-user",
+    command: () => undefined
+  },
+  {
+    label: "Sign out",
+    icon: "pi pi-sign-out",
+    command: () => {
+      void currentUser.signOut();
+    }
+  }
+];
 
 function applyTheme() {
   document.documentElement.classList.toggle("app-dark", isDark.value);
@@ -32,13 +49,9 @@ onMounted(async () => {
   applyTheme();
 
   try {
-    user.value = await getCurrentUser();
+    await currentUser.load();
   } catch (error) {
-    if (!(error instanceof ApiError) || error.status !== 401) {
-      console.warn("Failed to load current user", error);
-    }
-  } finally {
-    authChecked.value = true;
+    console.warn("Failed to load current user", error);
   }
 });
 </script>
@@ -68,12 +81,22 @@ onMounted(async () => {
       />
       <Button text rounded label="EN" aria-label="Language" />
       <Button
-        v-if="user"
+        v-if="currentUser.user"
         text
         icon="pi pi-user"
-        :label="user.userName"
+        :label="currentUser.user.userName"
+        @click="accountMenu?.toggle($event)"
       />
-      <Button v-else text icon="pi pi-sign-in" :label="authChecked ? 'Sign in' : 'Account'" />
+      <Button
+        v-else
+        text
+        icon="pi pi-sign-in"
+        :label="currentUser.checked ? 'Sign in' : 'Account'"
+        @click="signInVisible = true"
+      />
     </div>
+
+    <Menu ref="accountMenu" :model="accountMenuItems" popup />
+    <SignInDialog v-model:visible="signInVisible" />
   </header>
 </template>

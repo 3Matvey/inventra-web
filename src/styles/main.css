@@ -240,6 +240,37 @@ a {
   gap: 0.75rem;
 }
 
+.item-details {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.auth-page {
+  display: grid;
+  min-height: calc(100vh - 10rem);
+  place-items: center;
+}
+
+.auth-card {
+  display: grid;
+  width: min(30rem, 100%);
+  gap: 1rem;
+}
+
+.auth-card h1 {
+  margin: 0;
+  font-size: 2.25rem;
+}
+
+.auth-panel {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.auth-provider-link {
+  display: block;
+}
+
 .definition-row {
   display: grid;
   grid-template-columns: minmax(10rem, 18rem) minmax(0, 1fr);

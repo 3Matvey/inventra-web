@@ -35,6 +35,13 @@ export type InventoryItemsTableParams = {
   sortDescending?: boolean;
 };
 
+export type ItemFieldValueRequest = {
+  fieldId: Guid;
+  textValue: string | null;
+  numberValue: number | null;
+  booleanValue: boolean | null;
+};
+
 export type NumericFieldStatisticsDto = {
   fieldId: Guid;
   fieldTitle: string;

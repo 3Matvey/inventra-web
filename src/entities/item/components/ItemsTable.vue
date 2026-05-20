@@ -21,6 +21,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
+  add: [];
   page: [page: number, pageSize: number];
   sort: [sortBy: string | null, sortDescending: boolean];
 }>();
@@ -68,7 +69,7 @@ function handleSort(event: DataTableSortEvent) {
         </div>
       </template>
       <template #end>
-        <Button icon="pi pi-plus" label="Add item" />
+        <Button icon="pi pi-plus" label="Add item" @click="emit('add')" />
         <Button
           icon="pi pi-trash"
           label="Delete selected"

@@ -4,7 +4,8 @@ import type {
   InventoryItemDetailsDto,
   InventoryItemsTableParams,
   InventoryItemTableRowDto,
-  InventoryStatisticsDto
+  InventoryStatisticsDto,
+  ItemFieldValueRequest
 } from "./types";
 
 export function getInventoryItems(inventoryId: string, params: InventoryItemsTableParams = {}) {
@@ -24,4 +25,18 @@ export function getInventoryStatistics(inventoryId: string) {
 
 export function getItemDetails(itemId: string) {
   return http.get<InventoryItemDetailsDto>(`/items/${itemId}`);
+}
+
+export function likeItem(itemId: string) {
+  return http.post<void>(`/items/${itemId}/like`);
+}
+
+export function unlikeItem(itemId: string) {
+  return http.delete<void>(`/items/${itemId}/like`);
+}
+
+export function createInventoryItem(inventoryId: string, fieldValues: ItemFieldValueRequest[]) {
+  return http.post<string>(`/inventories/${inventoryId}/items`, {
+    fieldValues
+  });
 }
