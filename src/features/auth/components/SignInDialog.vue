@@ -6,7 +6,7 @@ import { buildExternalLoginUrl } from "../model/authLinks";
 
 const visible = defineModel<boolean>("visible", { required: true });
 
-const returnUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+const returnUrl = window.location.hash || "/";
 </script>
 
 <template>

@@ -136,6 +136,19 @@ export function updateInventorySettings(inventoryId: string, request: UpdateInve
   return http.put<void>(`/inventories/${inventoryId}/settings`, request);
 }
 
+export function updateInventoryTags(inventoryId: string, expectedVersion: number, tags: string[]) {
+  return http.put<void>(`/inventories/${inventoryId}/tags`, {
+    expectedVersion,
+    tags
+  });
+}
+
+export function deleteInventory(inventoryId: string, expectedVersion: number) {
+  return http.delete<void>(`/inventories/${inventoryId}`, {
+    query: { expectedVersion }
+  });
+}
+
 export function grantInventoryAccess(
   inventoryId: string,
   expectedVersion: number,
