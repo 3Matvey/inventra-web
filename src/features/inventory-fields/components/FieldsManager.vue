@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
+import { VueDraggable } from "vue-draggable-plus";
 import Button from "primevue/button";
 import Message from "primevue/message";
 import Tag from "primevue/tag";
 import { getInventoryDetails, removeInventoryField, reorderInventoryFields } from "@/entities/inventory/api";
 import type { InventoryDetailsDto, InventoryFieldDefinitionDto } from "@/entities/inventory/types";
 import { getFieldTypeLabel } from "@/entities/inventory/utils";
+import { useI18n } from "@/shared/i18n/useI18n";
 import { fieldTypeOptions, maxFieldsPerType, countFieldsByType } from "../model/fieldLimits";
 import FieldEditorDialog from "./FieldEditorDialog.vue";
 
@@ -17,13 +19,23 @@ const emit = defineEmits<{
   updated: [inventory: InventoryDetailsDto];
 }>();
 
+const { t } = useI18n();
 const selectedField = ref<InventoryFieldDefinitionDto | null>(null);
 const editorVisible = ref(false);
 const loading = ref(false);
 const errorMessage = ref<string | null>(null);
+const draggableFields = ref<InventoryFieldDefinitionDto[]>([]);
 
 const orderedFields = computed(() =>
   [...props.inventory.fields].sort((left, right) => left.order - right.order)
+);
+
+watch(
+  orderedFields,
+  (fields) => {
+    draggableFields.value = [...fields];
+  },
+  { immediate: true }
 );
 
 function openCreate() {
@@ -78,6 +90,25 @@ async function moveField(field: InventoryFieldDefinitionDto, direction: -1 | 1) 
     loading.value = false;
   }
 }
+
+async function saveDraggedOrder() {
+  const nextOrder = draggableFields.value.map((field) => field.id);
+  const currentOrder = orderedFields.value.map((field) => field.id);
+  if (nextOrder.join("|") === currentOrder.join("|")) return;
+
+  loading.value = true;
+  errorMessage.value = null;
+
+  try {
+    await reorderInventoryFields(props.inventory.id, props.inventory.version, nextOrder);
+    await reloadInventory();
+  } catch (error) {
+    errorMessage.value = error instanceof Error ? error.message : "Failed to reorder fields.";
+    draggableFields.value = [...orderedFields.value];
+  } finally {
+    loading.value = false;
+  }
+}
 </script>
 
 <template>
@@ -88,10 +119,10 @@ async function moveField(field: InventoryFieldDefinitionDto, direction: -1 | 1) 
 
     <div class="section-heading">
       <div>
-        <h2>Custom fields</h2>
-        <span class="muted">Up to {{ maxFieldsPerType }} fields per type</span>
+        <h2>{{ t("fields.title") }}</h2>
+        <span class="muted">{{ t("fields.limit", { count: maxFieldsPerType }) }}</span>
       </div>
-      <Button icon="pi pi-plus" label="Add field" :disabled="loading" @click="openCreate" />
+      <Button icon="pi pi-plus" :label="t('fields.add')" :disabled="loading" @click="openCreate" />
     </div>
 
     <div class="field-limit-row">
@@ -103,8 +134,16 @@ async function moveField(field: InventoryFieldDefinitionDto, direction: -1 | 1) 
       />
     </div>
 
-    <div class="definition-list">
-      <div v-for="(field, index) in orderedFields" :key="field.id" class="field-editor-row">
+    <VueDraggable
+      v-model="draggableFields"
+      class="definition-list"
+      handle=".drag-handle"
+      :animation="180"
+      ghost-class="drag-ghost"
+      @end="saveDraggedOrder"
+    >
+      <div v-for="(field, index) in draggableFields" :key="field.id" class="field-editor-row">
+        <i class="pi pi-bars drag-handle" aria-hidden="true" />
         <div class="field-editor-main">
           <strong>{{ field.title }}</strong>
           <span class="muted">
@@ -144,10 +183,10 @@ async function moveField(field: InventoryFieldDefinitionDto, direction: -1 | 1) 
         </div>
       </div>
 
-      <Message v-if="orderedFields.length === 0" severity="info" :closable="false">
-        No custom fields configured yet.
+      <Message v-if="draggableFields.length === 0" severity="info" :closable="false">
+        {{ t("fields.empty") }}
       </Message>
-    </div>
+    </VueDraggable>
 
     <FieldEditorDialog
       v-model:visible="editorVisible"

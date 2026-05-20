@@ -8,6 +8,7 @@ import Tag from "primevue/tag";
 import Toolbar from "primevue/toolbar";
 import { formatDateTime } from "@/shared/utils/date";
 import type { InventoryFieldDefinitionDto } from "@/entities/inventory/types";
+import { useI18n } from "@/shared/i18n/useI18n";
 import type { InventoryItemTableRowDto } from "../types";
 import { formatItemFieldValue } from "../utils";
 
@@ -18,6 +19,7 @@ const props = defineProps<{
   totalRecords: number;
   page: number;
   pageSize: number;
+  canWrite?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -29,6 +31,7 @@ const emit = defineEmits<{
 }>();
 
 const router = useRouter();
+const { t } = useI18n();
 const selectedItems = ref<InventoryItemTableRowDto[]>([]);
 
 const tableFields = computed(() =>
@@ -72,24 +75,24 @@ function editSelected() {
     <Toolbar>
       <template #start>
         <div class="toolbar-selection">
-          <Tag :value="`${selectedItems.length} selected`" severity="secondary" />
+          <Tag :value="`${selectedItems.length} ${t('items.selected')}`" severity="secondary" />
         </div>
       </template>
       <template #end>
-        <Button icon="pi pi-plus" label="Add item" @click="emit('add')" />
+        <Button icon="pi pi-plus" :label="t('items.add')" :disabled="!canWrite" @click="emit('add')" />
         <Button
           icon="pi pi-pencil"
-          label="Edit selected"
+          :label="t('items.editSelected')"
           outlined
-          :disabled="selectedItems.length !== 1"
+          :disabled="!canWrite || selectedItems.length !== 1"
           @click="editSelected"
         />
         <Button
           icon="pi pi-trash"
-          label="Delete selected"
+          :label="t('items.deleteSelected')"
           severity="danger"
           outlined
-          :disabled="selectedItems.length === 0"
+          :disabled="!canWrite || selectedItems.length === 0"
           @click="emit('delete', selectedItems)"
         />
       </template>

@@ -2,11 +2,13 @@
 import { ref } from "vue";
 import Button from "primevue/button";
 import Textarea from "primevue/textarea";
+import { useI18n } from "@/shared/i18n/useI18n";
 
 const emit = defineEmits<{
   submit: [bodyMarkdown: string];
 }>();
 
+const { t } = useI18n();
 const body = ref("");
 
 function submit() {
@@ -20,9 +22,9 @@ function submit() {
 
 <template>
   <form class="comment-composer" @submit.prevent="submit">
-    <Textarea v-model="body" rows="4" auto-resize placeholder="Write a comment with Markdown" />
+    <Textarea v-model="body" rows="4" auto-resize :placeholder="t('comments.placeholder')" />
     <div class="dialog-actions">
-      <Button type="submit" icon="pi pi-send" label="Post comment" :disabled="!body.trim()" />
+      <Button type="submit" icon="pi pi-send" :label="t('comments.post')" :disabled="!body.trim()" />
     </div>
   </form>
 </template>

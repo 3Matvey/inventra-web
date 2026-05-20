@@ -17,6 +17,7 @@ import { autocompleteUsers } from "@/entities/user/api";
 import type { InventoryAccessUserDto, InventoryDetailsDto } from "@/entities/inventory/types";
 import type { AutocompleteOptionDto } from "@/entities/tag/types";
 import { formatDateTime } from "@/shared/utils/date";
+import { useI18n } from "@/shared/i18n/useI18n";
 
 const props = defineProps<{
   inventory: InventoryDetailsDto;
@@ -26,6 +27,7 @@ const emit = defineEmits<{
   updated: [inventory: InventoryDetailsDto];
 }>();
 
+const { t } = useI18n();
 const sortMode = ref<"name" | "email">("name");
 const userDraft = ref<string | AutocompleteOptionDto>("");
 const userSuggestions = ref<AutocompleteOptionDto[]>([]);
@@ -110,9 +112,9 @@ async function revokeAccess(user: InventoryAccessUserDto) {
 
     <section class="access-panel">
       <div>
-        <h2>Public write access</h2>
+        <h2>{{ t("access.public") }}</h2>
         <p class="muted">
-          When enabled, every authenticated user can add and edit items in this inventory.
+          {{ t("access.publicHint") }}
         </p>
       </div>
       <ToggleSwitch
@@ -125,8 +127,8 @@ async function revokeAccess(user: InventoryAccessUserDto) {
     <section class="content-section">
       <div class="section-heading">
         <div>
-          <h2>Individual access</h2>
-          <span class="muted">Grant write access by username or email</span>
+          <h2>{{ t("access.individual") }}</h2>
+          <span class="muted">{{ t("access.individualHint") }}</span>
         </div>
         <SelectButton v-model="sortMode" :options="sortOptions" option-label="label" option-value="value" />
       </div>
@@ -147,13 +149,13 @@ async function revokeAccess(user: InventoryAccessUserDto) {
             </div>
           </template>
         </AutoComplete>
-        <Button icon="pi pi-plus" label="Grant" :loading="loading" @click="grantAccess()" />
+        <Button icon="pi pi-plus" :label="t('access.grant')" :loading="loading" @click="grantAccess()" />
       </div>
 
       <DataTable :value="sortedUsers" data-key="userId" striped-rows table-style="min-width: 42rem">
         <template #empty>No individual access grants.</template>
-        <Column field="userName" header="Name" sortable />
-        <Column field="email" header="Email" sortable />
+        <Column field="userName" :header="t('common.name')" sortable />
+        <Column field="email" :header="t('common.email')" sortable />
         <Column field="grantedAt" header="Granted" sortable>
           <template #body="{ data }">{{ formatDateTime(data.grantedAt) }}</template>
         </Column>

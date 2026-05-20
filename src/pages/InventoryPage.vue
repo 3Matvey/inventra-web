@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import Message from "primevue/message";
 import Tab from "primevue/tab";
 import TabList from "primevue/tablist";
@@ -30,12 +30,14 @@ import InventorySettingsForm from "@/features/inventory-settings/components/Inve
 import ItemCreateDialog from "@/features/item-editor/components/ItemCreateDialog.vue";
 import ItemEditorDialog from "@/features/item-editor/components/ItemEditorDialog.vue";
 import { useI18n } from "@/shared/i18n/useI18n";
+import { useCurrentUserStore } from "@/entities/user/stores/currentUser";
 
 const props = defineProps<{
   inventoryId: string;
 }>();
 
 const { t } = useI18n();
+const currentUser = useCurrentUserStore();
 const inventory = ref<InventoryDetailsDto | null>(null);
 const statistics = ref<InventoryStatisticsDto | null>(null);
 const items = ref<InventoryItemTableRowDto[]>([]);
@@ -50,6 +52,20 @@ const errorMessage = ref<string | null>(null);
 const itemCreateVisible = ref(false);
 const itemEditVisible = ref(false);
 const editingItem = ref<InventoryItemDetailsDto | null>(null);
+
+const canManageInventory = computed(() => {
+  if (!inventory.value || !currentUser.user) return false;
+  return currentUser.isAdmin || inventory.value.owner.id === currentUser.user.id;
+});
+
+const canWriteItems = computed(() => {
+  if (!inventory.value || !currentUser.user) return false;
+  return (
+    canManageInventory.value ||
+    inventory.value.isPublicWriteAccess ||
+    inventory.value.accessUsers.some((user) => user.userId === currentUser.user?.id)
+  );
+});
 
 async function loadInventory() {
   loading.value = true;
@@ -150,6 +166,9 @@ function handleInventoryUpdated(nextInventory: InventoryDetailsDto) {
 }
 
 onMounted(loadInventory);
+onMounted(() => {
+  if (!currentUser.checked) void currentUser.load();
+});
 </script>
 
 <template>
@@ -172,10 +191,10 @@ onMounted(loadInventory);
       <TabList>
         <Tab value="items">{{ t("inventory.tabs.items") }}</Tab>
         <Tab value="discussion">{{ t("inventory.tabs.discussion") }}</Tab>
-        <Tab value="settings">{{ t("inventory.tabs.settings") }}</Tab>
-        <Tab value="id-format">{{ t("inventory.tabs.idFormat") }}</Tab>
-        <Tab value="access">{{ t("inventory.tabs.access") }}</Tab>
-        <Tab value="fields">{{ t("inventory.tabs.fields") }}</Tab>
+        <Tab v-if="canManageInventory" value="settings">{{ t("inventory.tabs.settings") }}</Tab>
+        <Tab v-if="canManageInventory" value="id-format">{{ t("inventory.tabs.idFormat") }}</Tab>
+        <Tab v-if="canManageInventory" value="access">{{ t("inventory.tabs.access") }}</Tab>
+        <Tab v-if="canManageInventory" value="fields">{{ t("inventory.tabs.fields") }}</Tab>
         <Tab value="statistics">{{ t("inventory.tabs.statistics") }}</Tab>
       </TabList>
 
@@ -188,6 +207,7 @@ onMounted(loadInventory);
             :total-records="itemsTotal"
             :page="itemsPage"
             :page-size="itemsPageSize"
+            :can-write="canWriteItems"
             @add="itemCreateVisible = true"
             @edit="handleItemEditRequested"
             @delete="handleItemsDeleteRequested"
@@ -197,22 +217,22 @@ onMounted(loadInventory);
         </TabPanel>
 
         <TabPanel value="discussion">
-          <DiscussionTab :inventory-id="inventory.id" />
+          <DiscussionTab :inventory-id="inventory.id" :can-post="currentUser.isAuthenticated" />
         </TabPanel>
 
-        <TabPanel value="settings">
+        <TabPanel v-if="canManageInventory" value="settings">
           <InventorySettingsForm :inventory="inventory" @updated="handleInventoryUpdated" />
         </TabPanel>
 
-        <TabPanel value="id-format">
+        <TabPanel v-if="canManageInventory" value="id-format">
           <IdFormatManager :inventory="inventory" @updated="handleInventoryUpdated" />
         </TabPanel>
 
-        <TabPanel value="access">
+        <TabPanel v-if="canManageInventory" value="access">
           <AccessManager :inventory="inventory" @updated="handleInventoryUpdated" />
         </TabPanel>
 
-        <TabPanel value="fields">
+        <TabPanel v-if="canManageInventory" value="fields">
           <FieldsManager :inventory="inventory" @updated="handleInventoryUpdated" />
         </TabPanel>
 

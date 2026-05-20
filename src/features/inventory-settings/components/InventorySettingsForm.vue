@@ -8,6 +8,7 @@ import Tag from "primevue/tag";
 import Textarea from "primevue/textarea";
 import { getCategories } from "@/entities/category/api";
 import type { CategoryDto, InventoryDetailsDto } from "@/entities/inventory/types";
+import { useI18n } from "@/shared/i18n/useI18n";
 import { uploadInventoryImage } from "../api";
 import { useInventorySettingsAutosave } from "../model/useInventorySettingsAutosave";
 
@@ -19,6 +20,7 @@ const emit = defineEmits<{
   updated: [inventory: InventoryDetailsDto];
 }>();
 
+const { t } = useI18n();
 const categories = ref<CategoryDto[]>([]);
 const uploadLoading = ref(false);
 const currentInventory = computed(() => props.inventory);
@@ -86,7 +88,7 @@ void loadCategories();
       />
       <Button
         icon="pi pi-save"
-        label="Save now"
+        :label="t('settings.saveNow')"
         :loading="autosave.status.value === 'saving'"
         :disabled="!autosave.canSave.value"
         @click="autosave.save"
@@ -124,7 +126,7 @@ void loadCategories();
         <Tag v-for="tag in inventory.tags" :key="tag.id" :value="tag.name" />
       </div>
       <small class="muted">
-        Existing inventory tags are read-only until the backend exposes an update endpoint for tags.
+        {{ t("settings.tagsReadonly") }}
       </small>
     </div>
   </div>

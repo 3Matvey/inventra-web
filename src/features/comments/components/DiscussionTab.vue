@@ -5,13 +5,16 @@ import Tag from "primevue/tag";
 import { addInventoryComment, getInventoryComments } from "../api";
 import type { InventoryCommentDto } from "../types";
 import { useInventoryDiscussionHub } from "../model/useInventoryDiscussionHub";
+import { useI18n } from "@/shared/i18n/useI18n";
 import CommentComposer from "./CommentComposer.vue";
 import CommentList from "./CommentList.vue";
 
 const props = defineProps<{
   inventoryId: string;
+  canPost: boolean;
 }>();
 
+const { t } = useI18n();
 const comments = ref<InventoryCommentDto[]>([]);
 const loading = ref(true);
 const posting = ref(false);
@@ -66,13 +69,16 @@ onMounted(async () => {
 
     <div class="section-heading">
       <div>
-        <h2>Discussion</h2>
-        <span class="muted">New comments appear automatically.</span>
+        <h2>{{ t("comments.title") }}</h2>
+        <span class="muted">{{ t("comments.hint") }}</span>
       </div>
       <Tag :value="hub.connected.value ? 'live' : 'offline'" :severity="hub.connected.value ? 'success' : 'warn'" />
     </div>
 
-    <CommentComposer @submit="submitComment" />
+    <CommentComposer v-if="canPost" @submit="submitComment" />
+    <Message v-else severity="warn" :closable="false">
+      Sign in to leave comments.
+    </Message>
     <Message v-if="posting" severity="info" :closable="false">Posting comment...</Message>
     <Message v-if="loading" severity="info" :closable="false">Loading comments...</Message>
     <CommentList :comments="comments" />

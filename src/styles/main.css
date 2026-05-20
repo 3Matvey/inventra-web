@@ -432,7 +432,20 @@ a {
 }
 
 .field-editor-row {
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+.drag-handle {
+  color: var(--p-surface-400);
+  cursor: grab;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.drag-ghost {
+  opacity: 0.55;
 }
 
 .field-editor-main {

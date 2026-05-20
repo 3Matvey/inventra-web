@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
+import { VueDraggable } from "vue-draggable-plus";
 import Button from "primevue/button";
 import Message from "primevue/message";
 import Tag from "primevue/tag";
@@ -11,6 +12,7 @@ import {
 } from "@/entities/inventory/api";
 import type { InventoryDetailsDto, InventoryIdFormatElementDto } from "@/entities/inventory/types";
 import { getIdElementTypeLabel } from "@/entities/inventory/utils";
+import { useI18n } from "@/shared/i18n/useI18n";
 import {
   getFormatHint,
   recommendedMaxIdElements,
@@ -26,15 +28,25 @@ const emit = defineEmits<{
   updated: [inventory: InventoryDetailsDto];
 }>();
 
+const { t } = useI18n();
 const selectedElement = ref<InventoryIdFormatElementDto | null>(null);
 const editorVisible = ref(false);
 const preview = ref("");
 const loading = ref(false);
 const previewLoading = ref(false);
 const errorMessage = ref<string | null>(null);
+const draggableElements = ref<InventoryIdFormatElementDto[]>([]);
 
 const orderedElements = computed(() => sortIdElements(props.inventory.idFormatElements));
 const canAddElement = computed(() => orderedElements.value.length < recommendedMaxIdElements);
+
+watch(
+  orderedElements,
+  (elements) => {
+    draggableElements.value = [...elements];
+  },
+  { immediate: true }
+);
 
 function openCreate() {
   selectedElement.value = null;
@@ -104,6 +116,25 @@ async function moveElement(element: InventoryIdFormatElementDto, direction: -1 |
   }
 }
 
+async function saveDraggedOrder() {
+  const nextOrder = draggableElements.value.map((element) => element.id);
+  const currentOrder = orderedElements.value.map((element) => element.id);
+  if (nextOrder.join("|") === currentOrder.join("|")) return;
+
+  loading.value = true;
+  errorMessage.value = null;
+
+  try {
+    await reorderInventoryIdFormatElements(props.inventory.id, props.inventory.version, nextOrder);
+    await reloadInventory();
+  } catch (error) {
+    errorMessage.value = error instanceof Error ? error.message : "Failed to reorder ID elements.";
+    draggableElements.value = [...orderedElements.value];
+  } finally {
+    loading.value = false;
+  }
+}
+
 onMounted(loadPreview);
 watch(() => props.inventory.id, loadPreview);
 </script>
@@ -116,24 +147,27 @@ watch(() => props.inventory.id, loadPreview);
 
     <div class="section-heading">
       <div>
-        <h2>Custom ID format</h2>
-        <span class="muted">Recommended maximum: {{ recommendedMaxIdElements }} elements</span>
+        <h2>{{ t("idFormat.title") }}</h2>
+        <span class="muted">{{ t("idFormat.limit", { count: recommendedMaxIdElements }) }}</span>
       </div>
-      <Button icon="pi pi-plus" label="Add element" :disabled="!canAddElement || loading" @click="openCreate" />
+      <Button icon="pi pi-plus" :label="t('idFormat.add')" :disabled="!canAddElement || loading" @click="openCreate" />
     </div>
 
     <div class="id-preview">
-      <span class="muted">Preview</span>
+      <span class="muted">{{ t("idFormat.preview") }}</span>
       <strong>{{ previewLoading ? "Loading..." : preview || "No format configured" }}</strong>
     </div>
 
-    <Message severity="info" :closable="false">
-      Drag-and-drop removal is represented as explicit delete controls for now; ordering is preserved
-      with up/down controls and saved through the backend order endpoint.
-    </Message>
-
-    <div class="definition-list">
-      <div v-for="(element, index) in orderedElements" :key="element.id" class="field-editor-row">
+    <VueDraggable
+      v-model="draggableElements"
+      class="definition-list"
+      handle=".drag-handle"
+      :animation="180"
+      ghost-class="drag-ghost"
+      @end="saveDraggedOrder"
+    >
+      <div v-for="(element, index) in draggableElements" :key="element.id" class="field-editor-row">
+        <i class="pi pi-bars drag-handle" aria-hidden="true" />
         <div class="field-editor-main">
           <strong>{{ getIdElementTypeLabel(element.type) }}</strong>
           <span class="muted">{{ getFormatHint(element.type) }}</span>
@@ -157,7 +191,7 @@ watch(() => props.inventory.id, loadPreview);
             rounded
             icon="pi pi-arrow-down"
             aria-label="Move down"
-            :disabled="index === orderedElements.length - 1 || loading"
+            :disabled="index === draggableElements.length - 1 || loading"
             @click="moveElement(element, 1)"
           />
           <Button text rounded icon="pi pi-pencil" aria-label="Edit" :disabled="loading" @click="openEdit(element)" />
@@ -173,10 +207,10 @@ watch(() => props.inventory.id, loadPreview);
         </div>
       </div>
 
-      <Message v-if="orderedElements.length === 0" severity="warn" :closable="false">
-        Custom ID format is empty. Item creation requires a non-empty generated custom ID.
+      <Message v-if="draggableElements.length === 0" severity="warn" :closable="false">
+        {{ t("idFormat.empty") }}
       </Message>
-    </div>
+    </VueDraggable>
 
     <IdFormatElementDialog
       v-model:visible="editorVisible"

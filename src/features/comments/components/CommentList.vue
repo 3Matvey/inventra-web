@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { renderMarkdown } from "@/shared/utils/markdown";
 import { formatDateTime } from "@/shared/utils/date";
+import { useI18n } from "@/shared/i18n/useI18n";
 import type { InventoryCommentDto } from "../types";
 
 defineProps<{
   comments: InventoryCommentDto[];
 }>();
+
+const { t } = useI18n();
 </script>
 
 <template>
@@ -17,6 +20,6 @@ defineProps<{
       </header>
       <div class="markdown-body" v-html="renderMarkdown(comment.bodyMarkdown)" />
     </article>
-    <span v-if="comments.length === 0" class="muted">No comments yet.</span>
+    <span v-if="comments.length === 0" class="muted">{{ t("comments.empty") }}</span>
   </div>
 </template>
