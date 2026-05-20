@@ -247,6 +247,26 @@ a {
   gap: 0.4rem;
 }
 
+.id-preview {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1rem;
+  border: 1px solid var(--p-primary-200);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--p-primary-50) 72%, var(--p-surface-0));
+}
+
+.app-dark .id-preview {
+  border-color: var(--p-primary-900);
+  background: color-mix(in srgb, var(--p-primary-950) 42%, var(--p-surface-900));
+}
+
+.id-preview strong {
+  overflow-wrap: anywhere;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 1.35rem;
+}
+
 .item-details {
   display: grid;
   gap: 1.25rem;

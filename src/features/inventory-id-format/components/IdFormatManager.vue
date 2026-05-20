@@ -1,0 +1,188 @@
+<script setup lang="ts">
+import { computed, onMounted, ref, watch } from "vue";
+import Button from "primevue/button";
+import Message from "primevue/message";
+import Tag from "primevue/tag";
+import {
+  getInventoryDetails,
+  previewInventoryCustomId,
+  removeInventoryIdFormatElement,
+  reorderInventoryIdFormatElements
+} from "@/entities/inventory/api";
+import type { InventoryDetailsDto, InventoryIdFormatElementDto } from "@/entities/inventory/types";
+import { getIdElementTypeLabel } from "@/entities/inventory/utils";
+import {
+  getFormatHint,
+  recommendedMaxIdElements,
+  sortIdElements
+} from "../model/idFormatOptions";
+import IdFormatElementDialog from "./IdFormatElementDialog.vue";
+
+const props = defineProps<{
+  inventory: InventoryDetailsDto;
+}>();
+
+const emit = defineEmits<{
+  updated: [inventory: InventoryDetailsDto];
+}>();
+
+const selectedElement = ref<InventoryIdFormatElementDto | null>(null);
+const editorVisible = ref(false);
+const preview = ref("");
+const loading = ref(false);
+const previewLoading = ref(false);
+const errorMessage = ref<string | null>(null);
+
+const orderedElements = computed(() => sortIdElements(props.inventory.idFormatElements));
+const canAddElement = computed(() => orderedElements.value.length < recommendedMaxIdElements);
+
+function openCreate() {
+  selectedElement.value = null;
+  editorVisible.value = true;
+}
+
+function openEdit(element: InventoryIdFormatElementDto) {
+  selectedElement.value = element;
+  editorVisible.value = true;
+}
+
+async function loadPreview() {
+  previewLoading.value = true;
+
+  try {
+    preview.value = await previewInventoryCustomId(props.inventory.id);
+  } catch (error) {
+    preview.value = "";
+    errorMessage.value = error instanceof Error ? error.message : "Failed to load ID preview.";
+  } finally {
+    previewLoading.value = false;
+  }
+}
+
+async function reloadInventory() {
+  const nextInventory = await getInventoryDetails(props.inventory.id);
+  emit("updated", nextInventory);
+  await loadPreview();
+}
+
+async function deleteElement(element: InventoryIdFormatElementDto) {
+  loading.value = true;
+  errorMessage.value = null;
+
+  try {
+    await removeInventoryIdFormatElement(props.inventory.id, element, props.inventory.version);
+    await reloadInventory();
+  } catch (error) {
+    errorMessage.value = error instanceof Error ? error.message : "Failed to delete ID element.";
+  } finally {
+    loading.value = false;
+  }
+}
+
+async function moveElement(element: InventoryIdFormatElementDto, direction: -1 | 1) {
+  const nextOrder = orderedElements.value.map((current) => current.id);
+  const index = nextOrder.indexOf(element.id);
+  const targetIndex = index + direction;
+  if (targetIndex < 0 || targetIndex >= nextOrder.length) return;
+
+  const currentId = nextOrder[index];
+  const targetId = nextOrder[targetIndex];
+  if (!currentId || !targetId) return;
+
+  nextOrder[index] = targetId;
+  nextOrder[targetIndex] = currentId;
+  loading.value = true;
+  errorMessage.value = null;
+
+  try {
+    await reorderInventoryIdFormatElements(props.inventory.id, props.inventory.version, nextOrder);
+    await reloadInventory();
+  } catch (error) {
+    errorMessage.value = error instanceof Error ? error.message : "Failed to reorder ID elements.";
+  } finally {
+    loading.value = false;
+  }
+}
+
+onMounted(loadPreview);
+watch(() => props.inventory.id, loadPreview);
+</script>
+
+<template>
+  <div class="manager-stack">
+    <Message v-if="errorMessage" severity="error" :closable="false">
+      {{ errorMessage }}
+    </Message>
+
+    <div class="section-heading">
+      <div>
+        <h2>Custom ID format</h2>
+        <span class="muted">Recommended maximum: {{ recommendedMaxIdElements }} elements</span>
+      </div>
+      <Button icon="pi pi-plus" label="Add element" :disabled="!canAddElement || loading" @click="openCreate" />
+    </div>
+
+    <div class="id-preview">
+      <span class="muted">Preview</span>
+      <strong>{{ previewLoading ? "Loading..." : preview || "No format configured" }}</strong>
+    </div>
+
+    <Message severity="info" :closable="false">
+      Drag-and-drop removal is represented as explicit delete controls for now; ordering is preserved
+      with up/down controls and saved through the backend order endpoint.
+    </Message>
+
+    <div class="definition-list">
+      <div v-for="(element, index) in orderedElements" :key="element.id" class="field-editor-row">
+        <div class="field-editor-main">
+          <strong>{{ getIdElementTypeLabel(element.type) }}</strong>
+          <span class="muted">{{ getFormatHint(element.type) }}</span>
+          <div class="tag-list">
+            <Tag v-if="element.value" :value="`value: ${element.value}`" severity="secondary" />
+            <Tag v-if="element.format" :value="`format: ${element.format}`" severity="secondary" />
+          </div>
+        </div>
+
+        <div class="row-action-group">
+          <Button
+            text
+            rounded
+            icon="pi pi-arrow-up"
+            aria-label="Move up"
+            :disabled="index === 0 || loading"
+            @click="moveElement(element, -1)"
+          />
+          <Button
+            text
+            rounded
+            icon="pi pi-arrow-down"
+            aria-label="Move down"
+            :disabled="index === orderedElements.length - 1 || loading"
+            @click="moveElement(element, 1)"
+          />
+          <Button text rounded icon="pi pi-pencil" aria-label="Edit" :disabled="loading" @click="openEdit(element)" />
+          <Button
+            text
+            rounded
+            severity="danger"
+            icon="pi pi-trash"
+            aria-label="Delete"
+            :disabled="loading"
+            @click="deleteElement(element)"
+          />
+        </div>
+      </div>
+
+      <Message v-if="orderedElements.length === 0" severity="warn" :closable="false">
+        Custom ID format is empty. Item creation requires a non-empty generated custom ID.
+      </Message>
+    </div>
+
+    <IdFormatElementDialog
+      v-model:visible="editorVisible"
+      :inventory="inventory"
+      :element="selectedElement"
+      @saved="reloadInventory"
+    />
+  </div>
+</template>

@@ -13,10 +13,10 @@ import type { InventoryDetailsDto } from "@/entities/inventory/types";
 import type { InventoryItemTableRowDto, InventoryStatisticsDto } from "@/entities/item/types";
 import InventoryAccessSummary from "@/features/inventory-details/components/InventoryAccessSummary.vue";
 import InventoryHero from "@/features/inventory-details/components/InventoryHero.vue";
-import InventoryIdFormatSummary from "@/features/inventory-details/components/InventoryIdFormatSummary.vue";
 import InventorySettingsSummary from "@/features/inventory-details/components/InventorySettingsSummary.vue";
 import InventoryStatisticsPanel from "@/features/inventory-details/components/InventoryStatisticsPanel.vue";
 import FieldsManager from "@/features/inventory-fields/components/FieldsManager.vue";
+import IdFormatManager from "@/features/inventory-id-format/components/IdFormatManager.vue";
 import ItemCreateDialog from "@/features/item-editor/components/ItemCreateDialog.vue";
 
 const props = defineProps<{
@@ -162,7 +162,7 @@ onMounted(loadInventory);
         </TabPanel>
 
         <TabPanel value="id-format">
-          <InventoryIdFormatSummary :inventory="inventory" />
+          <IdFormatManager :inventory="inventory" @updated="handleInventoryUpdated" />
         </TabPanel>
 
         <TabPanel value="access">

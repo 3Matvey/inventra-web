@@ -4,6 +4,8 @@ import type {
   InventoryFieldDefinitionDto,
   InventoryFieldType,
   InventoryDetailsDto,
+  InventoryIdElementType,
+  InventoryIdFormatElementDto,
   InventorySearchParams,
   InventoryTableRowDto,
   TagCloudItemDto
@@ -54,6 +56,59 @@ export function reorderInventoryFields(
   return http.put<void>(`/inventories/${inventoryId}/fields/order`, {
     expectedVersion,
     orderedFieldIds
+  });
+}
+
+export type AddInventoryIdFormatElementRequest = {
+  expectedVersion: number;
+  type: InventoryIdElementType;
+  value: string | null;
+  format: string | null;
+};
+
+export type UpdateInventoryIdFormatElementRequest = {
+  expectedVersion: number;
+  value: string | null;
+  format: string | null;
+};
+
+export function previewInventoryCustomId(inventoryId: string) {
+  return http.get<string>(`/inventories/${inventoryId}/id-format/preview`);
+}
+
+export function addInventoryIdFormatElement(
+  inventoryId: string,
+  request: AddInventoryIdFormatElementRequest
+) {
+  return http.post<string>(`/inventories/${inventoryId}/id-format/elements`, request);
+}
+
+export function updateInventoryIdFormatElement(
+  inventoryId: string,
+  elementId: string,
+  request: UpdateInventoryIdFormatElementRequest
+) {
+  return http.put<void>(`/inventories/${inventoryId}/id-format/elements/${elementId}`, request);
+}
+
+export function removeInventoryIdFormatElement(
+  inventoryId: string,
+  element: InventoryIdFormatElementDto,
+  version: number
+) {
+  return http.delete<void>(`/inventories/${inventoryId}/id-format/elements/${element.id}`, {
+    query: { expectedVersion: version }
+  });
+}
+
+export function reorderInventoryIdFormatElements(
+  inventoryId: string,
+  expectedVersion: number,
+  orderedElementIds: string[]
+) {
+  return http.put<void>(`/inventories/${inventoryId}/id-format/elements/order`, {
+    expectedVersion,
+    orderedElementIds
   });
 }
 
