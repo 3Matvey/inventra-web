@@ -10,11 +10,13 @@ import Tabs from "primevue/tabs";
 import InventoryTable from "@/entities/inventory/components/InventoryTable.vue";
 import { getOwnedInventories, getWritableInventories } from "@/entities/inventory/api";
 import type { InventoryTableRowDto } from "@/entities/inventory/types";
+import { useI18n } from "@/shared/i18n/useI18n";
 
 const props = defineProps<{
   userId: string;
 }>();
 
+const { t } = useI18n();
 const emit = defineEmits<{
   create: [];
 }>();
@@ -54,16 +56,16 @@ onMounted(loadInventories);
 
     <div class="section-heading">
       <div>
-        <h2>My inventories</h2>
-        <span class="muted">Owned and writable inventory tables</span>
+        <h2>{{ t("profile.myInventories") }}</h2>
+        <span class="muted">{{ t("profile.hint") }}</span>
       </div>
-      <Button icon="pi pi-plus" label="Create inventory" @click="emit('create')" />
+      <Button icon="pi pi-plus" :label="t('home.create')" @click="emit('create')" />
     </div>
 
     <Tabs value="owned">
       <TabList>
-        <Tab value="owned">Owned</Tab>
-        <Tab value="writable">Writable</Tab>
+        <Tab value="owned">{{ t("profile.owned") }}</Tab>
+        <Tab value="writable">{{ t("profile.writable") }}</Tab>
       </TabList>
       <TabPanels>
         <TabPanel value="owned">

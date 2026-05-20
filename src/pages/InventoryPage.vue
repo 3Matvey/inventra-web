@@ -29,11 +29,13 @@ import IdFormatManager from "@/features/inventory-id-format/components/IdFormatM
 import InventorySettingsForm from "@/features/inventory-settings/components/InventorySettingsForm.vue";
 import ItemCreateDialog from "@/features/item-editor/components/ItemCreateDialog.vue";
 import ItemEditorDialog from "@/features/item-editor/components/ItemEditorDialog.vue";
+import { useI18n } from "@/shared/i18n/useI18n";
 
 const props = defineProps<{
   inventoryId: string;
 }>();
 
+const { t } = useI18n();
 const inventory = ref<InventoryDetailsDto | null>(null);
 const statistics = ref<InventoryStatisticsDto | null>(null);
 const items = ref<InventoryItemTableRowDto[]>([]);
@@ -168,13 +170,13 @@ onMounted(loadInventory);
 
     <Tabs v-if="inventory" value="items">
       <TabList>
-        <Tab value="items">Items</Tab>
-        <Tab value="discussion">Discussion</Tab>
-        <Tab value="settings">Settings</Tab>
-        <Tab value="id-format">Custom ID</Tab>
-        <Tab value="access">Access</Tab>
-        <Tab value="fields">Fields</Tab>
-        <Tab value="statistics">Statistics</Tab>
+        <Tab value="items">{{ t("inventory.tabs.items") }}</Tab>
+        <Tab value="discussion">{{ t("inventory.tabs.discussion") }}</Tab>
+        <Tab value="settings">{{ t("inventory.tabs.settings") }}</Tab>
+        <Tab value="id-format">{{ t("inventory.tabs.idFormat") }}</Tab>
+        <Tab value="access">{{ t("inventory.tabs.access") }}</Tab>
+        <Tab value="fields">{{ t("inventory.tabs.fields") }}</Tab>
+        <Tab value="statistics">{{ t("inventory.tabs.statistics") }}</Tab>
       </TabList>
 
       <TabPanels>

@@ -5,9 +5,11 @@ import Message from "primevue/message";
 import CreateInventoryDialog from "@/features/inventory-create/components/CreateInventoryDialog.vue";
 import ProfileInventoriesPanel from "@/features/profile-inventories/components/ProfileInventoriesPanel.vue";
 import { useCurrentUserStore } from "@/entities/user/stores/currentUser";
+import { useI18n } from "@/shared/i18n/useI18n";
 
 const router = useRouter();
 const currentUser = useCurrentUserStore();
+const { t } = useI18n();
 const createDialogVisible = ref(false);
 
 onMounted(async () => {
@@ -25,13 +27,13 @@ function handleInventoryCreated(inventoryId: string) {
   <div class="page-stack">
     <section class="page-heading">
       <div>
-        <p class="eyebrow">Profile</p>
-        <h1>{{ currentUser.user?.userName ?? "My profile" }}</h1>
+        <p class="eyebrow">{{ t("profile.eyebrow") }}</p>
+        <h1>{{ currentUser.user?.userName ?? t("profile.title") }}</h1>
       </div>
     </section>
 
     <Message v-if="currentUser.checked && !currentUser.user" severity="warn" :closable="false">
-      Sign in to view your inventories.
+      {{ t("profile.guest") }}
     </Message>
 
     <ProfileInventoriesPanel

@@ -7,10 +7,12 @@ import Menu from "primevue/menu";
 import type { MenuItem } from "primevue/menuitem";
 import SignInDialog from "@/features/auth/components/SignInDialog.vue";
 import { useCurrentUserStore } from "@/entities/user/stores/currentUser";
+import { useI18n } from "@/shared/i18n/useI18n";
 
 const router = useRouter();
 const route = useRoute();
 const currentUser = useCurrentUserStore();
+const { locale, t, toggleLocale } = useI18n();
 const searchTerm = ref(typeof route.query.term === "string" ? route.query.term : "");
 const isDark = ref(localStorage.getItem("inventra.theme") === "dark");
 const signInVisible = ref(false);
@@ -19,8 +21,8 @@ const accountMenu = ref<InstanceType<typeof Menu> | null>(null);
 const accountMenuItems = computed<MenuItem[]>(() => {
   const items: MenuItem[] = [
     {
-      label: "Profile",
       icon: "pi pi-user",
+      label: t("app.profile"),
       command: () => {
         void router.push({ name: "profile" });
       }
@@ -29,8 +31,8 @@ const accountMenuItems = computed<MenuItem[]>(() => {
 
   if (currentUser.isAdmin) {
     items.push({
-      label: "Admin users",
       icon: "pi pi-shield",
+      label: t("app.adminUsers"),
       command: () => {
         void router.push({ name: "admin-users" });
       }
@@ -38,8 +40,8 @@ const accountMenuItems = computed<MenuItem[]>(() => {
   }
 
   items.push({
-    label: "Sign out",
     icon: "pi pi-sign-out",
+    label: t("app.signOut"),
     command: () => {
       void currentUser.signOut();
     }
@@ -77,13 +79,13 @@ onMounted(async () => {
   <header class="app-header">
     <RouterLink class="brand" :to="{ name: 'home' }">
       <span class="brand-mark">I</span>
-      <span>Inventra</span>
+      <span>{{ t("app.brand") }}</span>
     </RouterLink>
 
     <form class="global-search" role="search" @submit.prevent="submitSearch">
       <span class="p-input-icon-left search-field">
         <i class="pi pi-search" />
-        <InputText v-model="searchTerm" placeholder="Search inventories" />
+        <InputText v-model="searchTerm" :placeholder="t('app.search')" />
       </span>
       <Button type="submit" icon="pi pi-arrow-right" aria-label="Search" />
     </form>
@@ -96,7 +98,7 @@ onMounted(async () => {
         :aria-label="isDark ? 'Switch to light theme' : 'Switch to dark theme'"
         @click="toggleTheme"
       />
-      <Button text rounded label="EN" aria-label="Language" />
+      <Button text rounded :label="locale.toUpperCase()" aria-label="Language" @click="toggleLocale" />
       <Button
         v-if="currentUser.user"
         text
@@ -108,7 +110,7 @@ onMounted(async () => {
         v-else
         text
         icon="pi pi-sign-in"
-        :label="currentUser.checked ? 'Sign in' : 'Account'"
+        :label="currentUser.checked ? t('app.signIn') : t('app.account')"
         @click="signInVisible = true"
       />
     </div>

@@ -6,6 +6,7 @@ import Tag from "primevue/tag";
 import Button from "primevue/button";
 import InventoryTable from "@/entities/inventory/components/InventoryTable.vue";
 import CreateInventoryDialog from "@/features/inventory-create/components/CreateInventoryDialog.vue";
+import { useI18n } from "@/shared/i18n/useI18n";
 import {
   getLatestInventories,
   getTagCloud,
@@ -14,6 +15,7 @@ import {
 import type { InventoryTableRowDto, TagCloudItemDto } from "@/entities/inventory/types";
 
 const router = useRouter();
+const { t } = useI18n();
 const latest = ref<InventoryTableRowDto[]>([]);
 const top = ref<InventoryTableRowDto[]>([]);
 const tags = ref<TagCloudItemDto[]>([]);
@@ -53,10 +55,10 @@ onMounted(loadHome);
   <div class="page-stack">
     <section class="page-heading">
       <div>
-        <p class="eyebrow">Inventory management</p>
-        <h1>Inventories</h1>
+        <p class="eyebrow">{{ t("home.eyebrow") }}</p>
+        <h1>{{ t("home.title") }}</h1>
       </div>
-      <Button icon="pi pi-plus" label="Create inventory" @click="createDialogVisible = true" />
+      <Button icon="pi pi-plus" :label="t('home.create')" @click="createDialogVisible = true" />
     </section>
 
     <Message v-if="errorMessage" severity="error" :closable="false">
@@ -65,15 +67,15 @@ onMounted(loadHome);
 
     <section class="content-section">
       <div class="section-heading">
-        <h2>Latest inventories</h2>
+        <h2>{{ t("home.latest") }}</h2>
       </div>
       <InventoryTable :inventories="latest" :loading="loading" />
     </section>
 
     <section class="content-section">
       <div class="section-heading">
-        <h2>Top inventories</h2>
-        <span class="muted">By item count</span>
+        <h2>{{ t("home.top") }}</h2>
+        <span class="muted">{{ t("home.topHint") }}</span>
       </div>
       <InventoryTable
         :inventories="top"
@@ -84,7 +86,7 @@ onMounted(loadHome);
 
     <section class="content-section">
       <div class="section-heading">
-        <h2>Tag cloud</h2>
+        <h2>{{ t("home.tags") }}</h2>
       </div>
       <div class="tag-cloud">
         <RouterLink
@@ -94,7 +96,7 @@ onMounted(loadHome);
         >
           <Tag :value="`${tag.name} ${tag.inventoriesCount}`" />
         </RouterLink>
-        <span v-if="!loading && tags.length === 0" class="muted">No tags yet.</span>
+        <span v-if="!loading && tags.length === 0" class="muted">{{ t("home.noTags") }}</span>
       </div>
     </section>
 

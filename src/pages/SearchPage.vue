@@ -5,8 +5,10 @@ import Message from "primevue/message";
 import InventoryTable from "@/entities/inventory/components/InventoryTable.vue";
 import { searchInventories } from "@/entities/inventory/api";
 import type { InventoryTableRowDto } from "@/entities/inventory/types";
+import { useI18n } from "@/shared/i18n/useI18n";
 
 const route = useRoute();
+const { t } = useI18n();
 const inventories = ref<InventoryTableRowDto[]>([]);
 const totalCount = ref(0);
 const loading = ref(false);
@@ -44,9 +46,9 @@ watch(() => route.fullPath, loadResults);
   <div class="page-stack">
     <section class="page-heading">
       <div>
-        <p class="eyebrow">Search</p>
-        <h1>{{ term || tagId ? "Inventory results" : "All inventories" }}</h1>
-        <p class="muted">{{ totalCount }} inventories found</p>
+        <p class="eyebrow">{{ t("search.eyebrow") }}</p>
+        <h1>{{ term || tagId ? t("search.results") : t("search.all") }}</h1>
+        <p class="muted">{{ totalCount }} {{ t("search.found") }}</p>
       </div>
     </section>
 
