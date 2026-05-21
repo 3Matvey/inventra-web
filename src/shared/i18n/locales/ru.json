@@ -37,6 +37,8 @@
   "items.add": "Добавить предмет",
   "items.editSelected": "Редактировать выбранный",
   "items.deleteSelected": "Удалить выбранные",
+  "items.exportCsv": "CSV",
+  "items.exportExcel": "Excel",
   "items.selected": "выбрано",
   "fields.title": "Пользовательские поля",
   "fields.limit": "До {count} полей каждого типа",

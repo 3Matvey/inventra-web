@@ -37,6 +37,8 @@
   "items.add": "Add item",
   "items.editSelected": "Edit selected",
   "items.deleteSelected": "Delete selected",
+  "items.exportCsv": "CSV",
+  "items.exportExcel": "Excel",
   "items.selected": "selected",
   "fields.title": "Custom fields",
   "fields.limit": "Up to {count} fields per type",

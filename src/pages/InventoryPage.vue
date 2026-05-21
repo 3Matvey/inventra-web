@@ -7,7 +7,7 @@ import TabPanel from "primevue/tabpanel";
 import TabPanels from "primevue/tabpanels";
 import Tabs from "primevue/tabs";
 import ItemsTable from "@/entities/item/components/ItemsTable.vue";
-import { getInventoryDetails } from "@/entities/inventory/api";
+import { downloadInventoryExport, getInventoryDetails, type InventoryExportFormat } from "@/entities/inventory/api";
 import {
   deleteInventoryItem,
   getInventoryItems,
@@ -48,6 +48,7 @@ const sortBy = ref<string | null>(null);
 const sortDescending = ref(false);
 const loading = ref(true);
 const itemsLoading = ref(false);
+const exportLoading = ref(false);
 const errorMessage = ref<string | null>(null);
 const itemCreateVisible = ref(false);
 const itemEditVisible = ref(false);
@@ -165,6 +166,19 @@ function handleInventoryUpdated(nextInventory: InventoryDetailsDto) {
   inventory.value = nextInventory;
 }
 
+async function handleExportRequested(format: InventoryExportFormat) {
+  exportLoading.value = true;
+  errorMessage.value = null;
+
+  try {
+    await downloadInventoryExport(props.inventoryId, format);
+  } catch (error) {
+    errorMessage.value = error instanceof Error ? error.message : "Failed to export inventory.";
+  } finally {
+    exportLoading.value = false;
+  }
+}
+
 onMounted(loadInventory);
 onMounted(() => {
   if (!currentUser.checked) void currentUser.load();
@@ -208,9 +222,11 @@ onMounted(() => {
             :page="itemsPage"
             :page-size="itemsPageSize"
             :can-write="canWriteItems"
+            :export-loading="exportLoading"
             @add="itemCreateVisible = true"
             @edit="handleItemEditRequested"
             @delete="handleItemsDeleteRequested"
+            @export="handleExportRequested"
             @page="handleItemsPage"
             @sort="handleItemsSort"
           />

@@ -20,12 +20,14 @@ const props = defineProps<{
   page: number;
   pageSize: number;
   canWrite?: boolean;
+  exportLoading?: boolean;
 }>();
 
 const emit = defineEmits<{
   add: [];
   edit: [item: InventoryItemTableRowDto];
   delete: [items: InventoryItemTableRowDto[]];
+  export: [format: "csv" | "xlsx"];
   page: [page: number, pageSize: number];
   sort: [sortBy: string | null, sortDescending: boolean];
 }>();
@@ -94,6 +96,20 @@ function editSelected() {
           outlined
           :disabled="!canWrite || selectedItems.length === 0"
           @click="emit('delete', selectedItems)"
+        />
+        <Button
+          icon="pi pi-file"
+          :label="t('items.exportCsv')"
+          outlined
+          :loading="exportLoading"
+          @click="emit('export', 'csv')"
+        />
+        <Button
+          icon="pi pi-file-excel"
+          :label="t('items.exportExcel')"
+          outlined
+          :loading="exportLoading"
+          @click="emit('export', 'xlsx')"
         />
       </template>
     </Toolbar>

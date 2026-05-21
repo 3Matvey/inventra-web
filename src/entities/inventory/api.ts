@@ -1,4 +1,5 @@
 import { http } from "@/shared/api/http";
+import { appConfig } from "@/shared/config/appConfig";
 import type { PagedResult } from "@/shared/types/common";
 import type {
   InventoryFieldDefinitionDto,
@@ -206,4 +207,28 @@ export function getTagCloud(count = 50) {
   return http.get<TagCloudItemDto[]>("/tags/cloud", {
     query: { count }
   });
+}
+
+export type InventoryExportFormat = "csv" | "xlsx";
+
+function getExportFileName(inventoryId: string, format: InventoryExportFormat) {
+  return `inventory-${inventoryId}.${format}`;
+}
+
+export async function downloadInventoryExport(inventoryId: string, format: InventoryExportFormat) {
+  const url = `${appConfig.apiBaseUrl}/inventories/${inventoryId}/export?format=${format}`;
+  const response = await fetch(url, { credentials: "include" });
+
+  if (!response.ok) {
+    throw new Error(response.statusText || "Failed to export inventory.");
+  }
+
+  const blob = await response.blob();
+  const href = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = href;
+  link.download = getExportFileName(inventoryId, format);
+  link.click();
+  URL.revokeObjectURL(href);
 }
