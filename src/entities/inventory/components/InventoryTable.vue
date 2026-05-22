@@ -33,17 +33,26 @@ function openInventory(inventory: InventoryTableRowDto) {
 
     <Column field="title" header="Inventory" sortable>
       <template #body="{ data }">
-        <div class="table-primary-cell">
-          <RouterLink
-            class="link-button"
-            :to="{ name: 'inventory', params: { inventoryId: data.id } }"
-            @click.stop="openInventory(data)"
-          >
-            {{ data.title }}
-          </RouterLink>
-          <span v-if="data.descriptionMarkdown" class="muted ellipsis">
-            {{ data.descriptionMarkdown }}
-          </span>
+        <div class="inventory-cell">
+          <img
+            v-if="data.imageUrl"
+            class="inventory-cell-image"
+            :src="data.imageUrl"
+            :alt="data.title"
+            loading="lazy"
+          />
+          <div class="table-primary-cell">
+            <RouterLink
+              class="link-button"
+              :to="{ name: 'inventory', params: { inventoryId: data.id } }"
+              @click.stop="openInventory(data)"
+            >
+              {{ data.title }}
+            </RouterLink>
+            <span v-if="data.descriptionMarkdown" class="muted ellipsis">
+              {{ data.descriptionMarkdown }}
+            </span>
+          </div>
         </div>
       </template>
     </Column>

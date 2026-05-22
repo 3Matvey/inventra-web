@@ -83,6 +83,25 @@ a {
   width: 100%;
 }
 
+.search-field {
+  position: relative;
+  display: block;
+}
+
+.search-field > i {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 0.9rem;
+  color: var(--p-surface-500);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.search-field input {
+  padding-left: 2.45rem;
+}
+
 .header-actions {
   display: inline-flex;
   justify-content: flex-end;
@@ -493,6 +512,25 @@ a {
 .table-primary-cell {
   display: grid;
   gap: 0.15rem;
+}
+
+.inventory-cell {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.inventory-cell:has(.table-primary-cell:first-child) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.inventory-cell-image {
+  width: 4.5rem;
+  aspect-ratio: 4 / 3;
+  border-radius: 6px;
+  object-fit: cover;
+  background: var(--p-surface-100);
 }
 
 .link-button {

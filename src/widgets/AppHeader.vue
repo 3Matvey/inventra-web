@@ -83,11 +83,11 @@ onMounted(async () => {
     </RouterLink>
 
     <form class="global-search" role="search" @submit.prevent="submitSearch">
-      <span class="p-input-icon-left search-field">
+      <span class="search-field">
         <i class="pi pi-search" />
         <InputText v-model="searchTerm" :placeholder="t('app.search')" />
       </span>
-      <Button type="submit" icon="pi pi-arrow-right" aria-label="Search" />
+      <Button type="submit" icon="pi pi-search" aria-label="Search" />
     </form>
 
     <div class="header-actions">
