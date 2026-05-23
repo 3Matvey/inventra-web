@@ -25,6 +25,7 @@
   "profile.hint": "Owned and writable inventory tables",
   "profile.owned": "Owned",
   "profile.writable": "Writable",
+  "profile.deleteSelected": "Delete selected",
   "inventory.tabs.items": "Items",
   "inventory.tabs.discussion": "Discussion",
   "inventory.tabs.settings": "Settings",

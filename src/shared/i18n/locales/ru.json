@@ -25,6 +25,7 @@
   "profile.hint": "Таблицы собственных и доступных инвентарей",
   "profile.owned": "Собственные",
   "profile.writable": "Доступные для записи",
+  "profile.deleteSelected": "Удалить выбранные",
   "inventory.tabs.items": "Предметы",
   "inventory.tabs.discussion": "Обсуждение",
   "inventory.tabs.settings": "Настройки",

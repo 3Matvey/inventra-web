@@ -10,9 +10,11 @@ defineProps<{
   inventories: InventoryTableRowDto[];
   loading?: boolean;
   emptyMessage?: string;
+  selectable?: boolean;
 }>();
 
 const router = useRouter();
+const selectedInventories = defineModel<InventoryTableRowDto[]>("selection", { default: [] });
 
 function openInventory(inventory: InventoryTableRowDto) {
   void router.push({ name: "inventory", params: { inventoryId: inventory.id } });
@@ -26,10 +28,12 @@ function openInventory(inventory: InventoryTableRowDto) {
     data-key="id"
     striped-rows
     table-style="min-width: 56rem"
-    selection-mode="single"
+    v-model:selection="selectedInventories"
     @row-click="openInventory($event.data)"
   >
     <template #empty>{{ emptyMessage ?? "No inventories found." }}</template>
+
+    <Column v-if="selectable" selection-mode="multiple" header-style="width: 3rem" />
 
     <Column field="title" header="Inventory" sortable>
       <template #body="{ data }">
