@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import Button from "primevue/button";
+import InputText from "primevue/inputtext";
 import Message from "primevue/message";
 import Tab from "primevue/tab";
 import TabList from "primevue/tablist";
@@ -29,9 +30,30 @@ const emit = defineEmits<{
 const owned = ref<InventoryTableRowDto[]>([]);
 const writable = ref<InventoryTableRowDto[]>([]);
 const selectedOwned = ref<InventoryTableRowDto[]>([]);
+const filterTerm = ref("");
 const loading = ref(true);
 const deleting = ref(false);
 const errorMessage = ref<string | null>(null);
+
+const filteredOwned = computed(() => filterInventories(owned.value, filterTerm.value));
+const filteredWritable = computed(() => filterInventories(writable.value, filterTerm.value));
+
+function searchableText(inventory: InventoryTableRowDto) {
+  return [
+    inventory.title,
+    inventory.descriptionMarkdown,
+    inventory.categoryName,
+    inventory.ownerName,
+    ...inventory.tags.map((tag) => tag.name)
+  ].filter(Boolean).join(" ").toLowerCase();
+}
+
+function filterInventories(inventories: InventoryTableRowDto[], term: string) {
+  const normalizedTerm = term.trim().toLowerCase();
+  if (!normalizedTerm) return inventories;
+
+  return inventories.filter((inventory) => searchableText(inventory).includes(normalizedTerm));
+}
 
 async function loadInventories() {
   loading.value = true;
@@ -100,6 +122,11 @@ onMounted(loadInventories);
       </div>
     </div>
 
+    <span class="profile-filter">
+      <i class="pi pi-filter" />
+      <InputText v-model="filterTerm" :placeholder="t('profile.filter')" />
+    </span>
+
     <Tabs value="owned">
       <TabList>
         <Tab value="owned">{{ t("profile.owned") }}</Tab>
@@ -109,7 +136,7 @@ onMounted(loadInventories);
         <TabPanel value="owned">
           <InventoryTable
             v-model:selection="selectedOwned"
-            :inventories="owned"
+            :inventories="filteredOwned"
             :loading="loading"
             selectable
             empty-message="You do not own any inventories yet."
@@ -117,7 +144,7 @@ onMounted(loadInventories);
         </TabPanel>
         <TabPanel value="writable">
           <InventoryTable
-            :inventories="writable"
+            :inventories="filteredWritable"
             :loading="loading"
             empty-message="No inventories have been shared with you yet."
           />

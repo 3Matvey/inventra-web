@@ -26,6 +26,7 @@
   "profile.owned": "Owned",
   "profile.writable": "Writable",
   "profile.deleteSelected": "Delete selected",
+  "profile.filter": "Filter profile inventories",
   "inventory.tabs.items": "Items",
   "inventory.tabs.discussion": "Discussion",
   "inventory.tabs.settings": "Settings",

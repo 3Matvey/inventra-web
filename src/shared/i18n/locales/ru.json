@@ -26,6 +26,7 @@
   "profile.owned": "Собственные",
   "profile.writable": "Доступные для записи",
   "profile.deleteSelected": "Удалить выбранные",
+  "profile.filter": "Фильтр инвентарей профиля",
   "inventory.tabs.items": "Предметы",
   "inventory.tabs.discussion": "Обсуждение",
   "inventory.tabs.settings": "Настройки",
