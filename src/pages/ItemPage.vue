@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import Message from "primevue/message";
 import { getInventoryDetails } from "@/entities/inventory/api";
@@ -8,18 +8,34 @@ import type { InventoryDetailsDto } from "@/entities/inventory/types";
 import type { InventoryItemDetailsDto } from "@/entities/item/types";
 import ItemDetailsPanel from "@/features/item-details/components/ItemDetailsPanel.vue";
 import ItemEditorDialog from "@/features/item-editor/components/ItemEditorDialog.vue";
+import { useCurrentUserStore } from "@/entities/user/stores/currentUser";
 
 const props = defineProps<{
   itemId: string;
 }>();
 
 const router = useRouter();
+const currentUser = useCurrentUserStore();
 const item = ref<InventoryItemDetailsDto | null>(null);
 const inventory = ref<InventoryDetailsDto | null>(null);
 const loading = ref(true);
 const likeLoading = ref(false);
 const editVisible = ref(false);
 const errorMessage = ref<string | null>(null);
+
+const canManageInventory = computed(() => {
+  if (!inventory.value || !currentUser.user) return false;
+  return currentUser.isAdmin || inventory.value.owner.id === currentUser.user.id;
+});
+
+const canWriteItem = computed(() => {
+  if (!inventory.value || !currentUser.user) return false;
+  return (
+    canManageInventory.value ||
+    inventory.value.isPublicWriteAccess ||
+    inventory.value.accessUsers.some((user) => user.userId === currentUser.user?.id)
+  );
+});
 
 async function loadItem() {
   loading.value = true;
@@ -68,6 +84,9 @@ async function toggleLike() {
 }
 
 onMounted(loadItem);
+onMounted(() => {
+  if (!currentUser.checked) void currentUser.load();
+});
 </script>
 
 <template>
@@ -82,13 +101,15 @@ onMounted(loadItem);
       v-if="item"
       :item="item"
       :like-loading="likeLoading"
+      :can-write="canWriteItem"
+      :can-like="currentUser.isAuthenticated"
       @toggle-like="toggleLike"
       @edit="editVisible = true"
       @delete="deleteItem"
     />
 
     <ItemEditorDialog
-      v-if="item && inventory"
+      v-if="item && inventory && canWriteItem"
       v-model:visible="editVisible"
       mode="edit"
       :inventory-id="inventory.id"

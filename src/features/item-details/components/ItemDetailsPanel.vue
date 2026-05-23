@@ -9,6 +9,8 @@ import type { InventoryItemDetailsDto } from "@/entities/item/types";
 defineProps<{
   item: InventoryItemDetailsDto;
   likeLoading: boolean;
+  canWrite: boolean;
+  canLike: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -26,14 +28,23 @@ const emit = defineEmits<{
         <h1>{{ item.customId }}</h1>
       </div>
       <div class="row-action-group">
-        <Button icon="pi pi-pencil" label="Edit" outlined @click="emit('edit')" />
-        <Button icon="pi pi-trash" label="Delete" severity="danger" outlined @click="emit('delete')" />
+        <Button v-if="canWrite" icon="pi pi-pencil" label="Edit" outlined @click="emit('edit')" />
         <Button
+          v-if="canWrite"
+          icon="pi pi-trash"
+          label="Delete"
+          severity="danger"
+          outlined
+          @click="emit('delete')"
+        />
+        <Button
+          v-if="canLike"
           :icon="item.isLikedByCurrentUser ? 'pi pi-heart-fill' : 'pi pi-heart'"
           :label="`${item.likesCount} likes`"
           :loading="likeLoading"
           @click="emit('toggleLike')"
         />
+        <Tag v-else :value="`${item.likesCount} likes`" severity="secondary" />
       </div>
     </div>
 
