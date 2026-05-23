@@ -34,6 +34,7 @@
   "inventory.tabs.access": "Доступ",
   "inventory.tabs.fields": "Поля",
   "inventory.tabs.statistics": "Статистика",
+  "inventory.delete": "Удалить инвентарь",
   "admin.eyebrow": "Админ",
   "admin.title": "Управление пользователями",
   "items.add": "Добавить предмет",

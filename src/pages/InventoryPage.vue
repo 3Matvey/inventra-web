@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 import Message from "primevue/message";
 import Tab from "primevue/tab";
 import TabList from "primevue/tablist";
@@ -7,7 +8,12 @@ import TabPanel from "primevue/tabpanel";
 import TabPanels from "primevue/tabpanels";
 import Tabs from "primevue/tabs";
 import ItemsTable from "@/entities/item/components/ItemsTable.vue";
-import { downloadInventoryExport, getInventoryDetails, type InventoryExportFormat } from "@/entities/inventory/api";
+import {
+  deleteInventory,
+  downloadInventoryExport,
+  getInventoryDetails,
+  type InventoryExportFormat
+} from "@/entities/inventory/api";
 import {
   deleteInventoryItem,
   getInventoryItems,
@@ -37,6 +43,7 @@ const props = defineProps<{
 }>();
 
 const { t } = useI18n();
+const router = useRouter();
 const currentUser = useCurrentUserStore();
 const inventory = ref<InventoryDetailsDto | null>(null);
 const statistics = ref<InventoryStatisticsDto | null>(null);
@@ -49,6 +56,7 @@ const sortDescending = ref(false);
 const loading = ref(true);
 const itemsLoading = ref(false);
 const exportLoading = ref(false);
+const deleteLoading = ref(false);
 const errorMessage = ref<string | null>(null);
 const itemCreateVisible = ref(false);
 const itemEditVisible = ref(false);
@@ -179,6 +187,22 @@ async function handleExportRequested(format: InventoryExportFormat) {
   }
 }
 
+async function handleInventoryDeleteRequested() {
+  if (!inventory.value) return;
+
+  deleteLoading.value = true;
+  errorMessage.value = null;
+
+  try {
+    await deleteInventory(inventory.value.id, inventory.value.version);
+    void router.push({ name: "home" });
+  } catch (error) {
+    errorMessage.value = error instanceof Error ? error.message : "Failed to delete inventory.";
+  } finally {
+    deleteLoading.value = false;
+  }
+}
+
 onMounted(loadInventory);
 onMounted(() => {
   if (!currentUser.checked) void currentUser.load();
@@ -195,6 +219,9 @@ onMounted(() => {
       v-if="inventory"
       :inventory="inventory"
       :items-count="statistics?.itemsCount ?? itemsTotal"
+      :can-manage="canManageInventory"
+      :delete-loading="deleteLoading"
+      @delete="handleInventoryDeleteRequested"
     />
 
     <section v-else-if="loading" class="content-section">

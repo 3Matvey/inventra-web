@@ -1,14 +1,23 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import Badge from "primevue/badge";
+import Button from "primevue/button";
 import Tag from "primevue/tag";
+import { useI18n } from "@/shared/i18n/useI18n";
 import type { InventoryDetailsDto } from "@/entities/inventory/types";
 
 const props = defineProps<{
   inventory: InventoryDetailsDto;
   itemsCount: number;
+  canManage?: boolean;
+  deleteLoading?: boolean;
 }>();
 
+const emit = defineEmits<{
+  delete: [];
+}>();
+
+const { t } = useI18n();
 const visibleFieldsCount = computed(
   () => props.inventory.fields.filter((field) => field.showInTable).length
 );
@@ -25,10 +34,21 @@ const visibleFieldsCount = computed(
     <div class="inventory-summary">
       <div class="inventory-heading-line">
         <p class="eyebrow">{{ inventory.category.name }}</p>
-        <Badge
-          :value="inventory.isPublicWriteAccess ? 'Public write' : 'Restricted write'"
-          :severity="inventory.isPublicWriteAccess ? 'success' : 'secondary'"
-        />
+        <div class="row-action-group">
+          <Badge
+            :value="inventory.isPublicWriteAccess ? 'Public write' : 'Restricted write'"
+            :severity="inventory.isPublicWriteAccess ? 'success' : 'secondary'"
+          />
+          <Button
+            v-if="canManage"
+            icon="pi pi-trash"
+            :label="t('inventory.delete')"
+            severity="danger"
+            outlined
+            :loading="deleteLoading"
+            @click="emit('delete')"
+          />
+        </div>
       </div>
       <h1>{{ inventory.title }}</h1>
       <p v-if="inventory.descriptionMarkdown" class="inventory-description">

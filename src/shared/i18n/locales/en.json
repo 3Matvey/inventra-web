@@ -34,6 +34,7 @@
   "inventory.tabs.access": "Access",
   "inventory.tabs.fields": "Fields",
   "inventory.tabs.statistics": "Statistics",
+  "inventory.delete": "Delete inventory",
   "admin.eyebrow": "Admin",
   "admin.title": "User management",
   "items.add": "Add item",
