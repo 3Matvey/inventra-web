@@ -62,8 +62,18 @@ function handlePage(event: DataTablePageEvent) {
   emit("page", event.page + 1, event.rows);
 }
 
+function mapSortField(sortField: DataTableSortEvent["sortField"]) {
+  const field = String(sortField ?? "");
+
+  return {
+    createdAt: "created_at",
+    customId: "custom_id",
+    likesCount: "likes_count"
+  }[field] ?? null;
+}
+
 function handleSort(event: DataTableSortEvent) {
-  emit("sort", String(event.sortField ?? "") || null, event.sortOrder === -1);
+  emit("sort", mapSortField(event.sortField), event.sortOrder === -1);
 }
 
 function editSelected() {
@@ -144,7 +154,7 @@ function editSelected() {
           </RouterLink>
         </template>
       </Column>
-      <Column field="createdByUserName" header="Created by" sortable />
+      <Column field="createdByUserName" header="Created by" />
       <Column field="likesCount" header="Likes" sortable />
 
       <Column
@@ -152,7 +162,6 @@ function editSelected() {
         :key="field.id"
         :field="field.id"
         :header="field.title"
-        sortable
       >
         <template #body="{ data }">
           {{ getFieldValue(data, field.id) }}
