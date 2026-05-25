@@ -2,9 +2,10 @@
 import Button from "primevue/button";
 import Tag from "primevue/tag";
 import { RouterLink } from "vue-router";
+import { InventoryFieldType } from "@/entities/inventory/types";
 import { formatDateTime } from "@/shared/utils/date";
 import { formatItemFieldValue } from "@/entities/item/utils";
-import type { InventoryItemDetailsDto } from "@/entities/item/types";
+import type { InventoryItemDetailsDto, ItemFieldValueDto } from "@/entities/item/types";
 
 defineProps<{
   item: InventoryItemDetailsDto;
@@ -18,6 +19,26 @@ const emit = defineEmits<{
   edit: [];
   delete: [];
 }>();
+
+function getLinkUrl(value: ItemFieldValueDto) {
+  const url = value.textValue?.trim();
+  if (!url) return null;
+
+  try {
+    return new URL(url).toString();
+  } catch {
+    return null;
+  }
+}
+
+function getLinkPreviewKind(url: string | null) {
+  if (!url) return null;
+  const path = new URL(url).pathname.toLowerCase();
+
+  if (/\.(png|jpe?g|webp|gif|bmp|svg)$/.test(path)) return "image";
+  if (path.endsWith(".pdf")) return "pdf";
+  return null;
+}
 </script>
 
 <template>
@@ -78,7 +99,33 @@ const emit = defineEmits<{
       <div class="definition-list">
         <div v-for="value in item.fieldValues" :key="value.fieldId" class="definition-row">
           <strong>{{ value.fieldTitle }}</strong>
-          <span>{{ formatItemFieldValue(value) }}</span>
+          <div v-if="value.fieldType === InventoryFieldType.Link" class="link-preview-stack">
+            <a
+              v-if="getLinkUrl(value)"
+              class="link-button"
+              :href="getLinkUrl(value) ?? undefined"
+              target="_blank"
+              rel="noreferrer"
+            >
+              {{ formatItemFieldValue(value) }}
+            </a>
+            <span v-else>{{ formatItemFieldValue(value) }}</span>
+
+            <img
+              v-if="getLinkPreviewKind(getLinkUrl(value)) === 'image'"
+              class="item-link-image-preview"
+              :src="getLinkUrl(value) ?? undefined"
+              :alt="value.fieldTitle"
+              loading="lazy"
+            />
+            <iframe
+              v-else-if="getLinkPreviewKind(getLinkUrl(value)) === 'pdf'"
+              class="item-link-pdf-preview"
+              :src="getLinkUrl(value) ?? undefined"
+              :title="value.fieldTitle"
+            />
+          </div>
+          <span v-else>{{ formatItemFieldValue(value) }}</span>
         </div>
         <span v-if="item.fieldValues.length === 0" class="muted">No custom field values.</span>
       </div>

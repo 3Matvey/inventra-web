@@ -459,6 +459,34 @@ a {
   display: block;
 }
 
+.link-preview-stack {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.item-link-image-preview,
+.item-link-pdf-preview {
+  width: min(42rem, 100%);
+  border: 1px solid var(--p-surface-200);
+  border-radius: 8px;
+  background: var(--p-surface-50);
+}
+
+.item-link-image-preview {
+  max-height: 22rem;
+  object-fit: contain;
+}
+
+.item-link-pdf-preview {
+  height: 28rem;
+}
+
+.app-dark .item-link-image-preview,
+.app-dark .item-link-pdf-preview {
+  border-color: var(--p-surface-800);
+  background: var(--p-surface-900);
+}
+
 .definition-row,
 .field-editor-row {
   display: grid;
