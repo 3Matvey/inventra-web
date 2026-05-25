@@ -1,12 +1,20 @@
 <script setup lang="ts">
 import Button from "primevue/button";
 import Dialog from "primevue/dialog";
+import Divider from "primevue/divider";
 import Message from "primevue/message";
 import { buildExternalLoginUrl } from "../model/authLinks";
+import PasswordAuthPanel from "./PasswordAuthPanel.vue";
+import { useI18n } from "@/shared/i18n/useI18n";
 
 const visible = defineModel<boolean>("visible", { required: true });
 
+const { t } = useI18n();
 const returnUrl = window.location.hash || "/";
+
+function closeDialog() {
+  visible.value = false;
+}
 </script>
 
 <template>
@@ -18,16 +26,19 @@ const returnUrl = window.location.hash || "/";
   >
     <div class="auth-panel">
       <Message severity="info" :closable="false">
-        Sign in with a social account to create inventories, add items, leave comments, and like
-        items.
+        {{ t("auth.hint") }}
       </Message>
 
+      <PasswordAuthPanel @authenticated="closeDialog" />
+
+      <Divider align="center">{{ t("auth.or") }}</Divider>
+
       <a class="auth-provider-link" :href="buildExternalLoginUrl('Google', returnUrl)">
-        <Button icon="pi pi-google" label="Continue with Google" fluid />
+        <Button icon="pi pi-google" :label="t('auth.continueGoogle')" fluid />
       </a>
 
       <a class="auth-provider-link" :href="buildExternalLoginUrl('GitHub', returnUrl)">
-        <Button icon="pi pi-github" label="Continue with GitHub" severity="secondary" outlined fluid />
+        <Button icon="pi pi-github" :label="t('auth.continueGithub')" severity="secondary" outlined fluid />
       </a>
     </div>
   </Dialog>

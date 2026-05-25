@@ -455,6 +455,27 @@ a {
   gap: 0.75rem;
 }
 
+.password-auth-panel {
+  display: grid;
+  gap: 1rem;
+}
+
+.form-field,
+.checkbox-field {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.checkbox-field {
+  align-items: center;
+  grid-template-columns: auto 1fr;
+}
+
+.auth-actions {
+  display: grid;
+  gap: 0.75rem;
+}
+
 .auth-provider-link {
   display: block;
 }

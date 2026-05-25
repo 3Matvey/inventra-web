@@ -16,6 +16,7 @@ export const router = createRouter({
     {
       path: "/sign-in",
       name: "sign-in",
+      alias: "/login",
       component: () => import("@/pages/SignInPage.vue")
     },
     {
