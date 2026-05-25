@@ -134,6 +134,7 @@ async function saveDraggedOrder() {
 
   const nextOrder = draggableElements.value.map((element) => element.id);
   const currentOrder = orderedElements.value.map((element) => element.id);
+  if (nextOrder.length !== currentOrder.length) return;
   if (nextOrder.join("|") === currentOrder.join("|")) return;
 
   loading.value = true;
