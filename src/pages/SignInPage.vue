@@ -5,6 +5,7 @@ import Message from "primevue/message";
 import { computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import PasswordAuthPanel from "@/features/auth/components/PasswordAuthPanel.vue";
+import SetPasswordPanel from "@/features/auth/components/SetPasswordPanel.vue";
 import { buildExternalLoginUrl } from "@/features/auth/model/authLinks";
 import { useI18n } from "@/shared/i18n/useI18n";
 
@@ -14,9 +15,20 @@ const router = useRouter();
 const { t } = useI18n();
 
 const emailConfirmed = computed(() => route.query.emailConfirmed === "true");
+const isPasswordSetup = computed(() => route.query.setupPassword === "true");
+const setupUserId = computed(() => stringQueryValue(route.query.userId));
+const setupToken = computed(() => stringQueryValue(route.query.token));
 
 function goHome() {
   void router.push({ name: "home" });
+}
+
+function showLogin() {
+  void router.replace({ name: "sign-in" });
+}
+
+function stringQueryValue(value: unknown) {
+  return typeof value === "string" ? value : undefined;
 }
 </script>
 
@@ -24,15 +36,22 @@ function goHome() {
   <div class="auth-page">
     <section class="auth-card">
       <p class="eyebrow">{{ t("app.account") }}</p>
-      <h1>{{ t("auth.title") }}</h1>
+      <h1>{{ isPasswordSetup ? t("auth.setPassword.title") : t("auth.title") }}</h1>
       <Message v-if="emailConfirmed" severity="success" :closable="false">
         {{ t("auth.emailConfirmed") }}
       </Message>
-      <Message severity="info" :closable="false">
+      <Message v-if="!isPasswordSetup" severity="info" :closable="false">
         {{ t("auth.hint") }}
       </Message>
 
-      <div class="auth-panel">
+      <SetPasswordPanel
+        v-if="isPasswordSetup"
+        :user-id="setupUserId"
+        :token="setupToken"
+        @completed="showLogin"
+      />
+
+      <div v-else class="auth-panel">
         <PasswordAuthPanel @authenticated="goHome" />
 
         <Divider align="center">{{ t("auth.or") }}</Divider>

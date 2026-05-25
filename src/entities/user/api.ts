@@ -20,6 +20,12 @@ export type LoginWithPasswordRequest = {
   rememberMe: boolean;
 };
 
+export type SetPasswordRequest = {
+  userId: string;
+  token: string;
+  password: string;
+};
+
 export function getCurrentUser() {
   return http.get<UserProfileResponse>("/auth/me");
 }
@@ -34,6 +40,10 @@ export function loginWithPassword(request: LoginWithPasswordRequest) {
 
 export function resendEmailConfirmation(email: string) {
   return http.post<void>("/auth/resend-confirmation", { email });
+}
+
+export function setPassword(request: SetPasswordRequest) {
+  return http.post<void>("/auth/set-password", request);
 }
 
 export function logout() {
