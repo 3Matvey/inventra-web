@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { reactive } from "vue";
 import Button from "primevue/button";
 import Tag from "primevue/tag";
 import { RouterLink } from "vue-router";
@@ -20,6 +21,8 @@ const emit = defineEmits<{
   delete: [];
 }>();
 
+const failedImagePreviews = reactive<Record<string, boolean>>({});
+
 function getLinkUrl(value: ItemFieldValueDto) {
   const url = value.textValue?.trim();
   if (!url) return null;
@@ -31,13 +34,21 @@ function getLinkUrl(value: ItemFieldValueDto) {
   }
 }
 
-function getLinkPreviewKind(url: string | null) {
+function isPdfLink(url: string | null) {
   if (!url) return null;
-  const path = new URL(url).pathname.toLowerCase();
+  const parsedUrl = new URL(url);
+  const searchableUrl = `${parsedUrl.pathname}${parsedUrl.search}`.toLowerCase();
 
-  if (/\.(png|jpe?g|webp|gif|bmp|svg)$/.test(path)) return "image";
-  if (path.endsWith(".pdf")) return "pdf";
-  return null;
+  return searchableUrl.includes(".pdf");
+}
+
+function canTryImagePreview(value: ItemFieldValueDto) {
+  const url = getLinkUrl(value);
+  return Boolean(url && !isPdfLink(url) && !failedImagePreviews[value.fieldId]);
+}
+
+function markImagePreviewFailed(value: ItemFieldValueDto) {
+  failedImagePreviews[value.fieldId] = true;
 }
 </script>
 
@@ -112,14 +123,15 @@ function getLinkPreviewKind(url: string | null) {
             <span v-else>{{ formatItemFieldValue(value) }}</span>
 
             <img
-              v-if="getLinkPreviewKind(getLinkUrl(value)) === 'image'"
+              v-if="canTryImagePreview(value)"
               class="item-link-image-preview"
               :src="getLinkUrl(value) ?? undefined"
               :alt="value.fieldTitle"
               loading="lazy"
+              @error="markImagePreviewFailed(value)"
             />
             <iframe
-              v-else-if="getLinkPreviewKind(getLinkUrl(value)) === 'pdf'"
+              v-else-if="isPdfLink(getLinkUrl(value))"
               class="item-link-pdf-preview"
               :src="getLinkUrl(value) ?? undefined"
               :title="value.fieldTitle"
