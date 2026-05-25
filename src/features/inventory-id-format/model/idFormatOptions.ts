@@ -45,6 +45,41 @@ export function getFormatHint(type: InventoryIdElementType) {
   }
 }
 
+export function getFormatHelp(type: InventoryIdElementType) {
+  switch (type) {
+    case InventoryIdElementType.FixedText:
+      return [
+        "Fixed text is inserted exactly as typed.",
+        "Unicode is supported, so prefixes like INV-Ж- or 📦- are valid.",
+        "This element does not use a format value."
+      ];
+    case InventoryIdElementType.Guid:
+      return [
+        "Use standard GUID formats: D, N, B, P, or X.",
+        "D example: 7f9c2a1e-7b31-4a4d-9b5d-2c9dfcbbf19a.",
+        "N removes dashes; B and P wrap the value in braces or parentheses."
+      ];
+    case InventoryIdElementType.DateTime:
+      return [
+        "Use .NET date/time patterns.",
+        "yyyyMMdd gives 20260525.",
+        "yyyy-MM-dd-HHmm gives 2026-05-25-1430."
+      ];
+    case InventoryIdElementType.Sequence:
+      return [
+        "Sequence is the largest existing sequence number in this inventory plus one.",
+        "D4 or 0000 pads values with leading zeros.",
+        "Existing item IDs are not regenerated when this format changes."
+      ];
+    default:
+      return [
+        "Use .NET numeric format strings.",
+        "D6 pads integer-like values to six digits.",
+        "Custom zero patterns such as 00000000 keep leading zeros."
+      ];
+  }
+}
+
 export function sortIdElements(elements: InventoryIdFormatElementDto[]) {
   return [...elements].sort((left, right) => left.order - right.order);
 }

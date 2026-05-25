@@ -4,6 +4,7 @@ import Button from "primevue/button";
 import Dialog from "primevue/dialog";
 import InputText from "primevue/inputtext";
 import Message from "primevue/message";
+import Popover from "primevue/popover";
 import Select from "primevue/select";
 import type {
   InventoryDetailsDto,
@@ -16,6 +17,7 @@ import {
 } from "@/entities/inventory/api";
 import {
   defaultIdElementType,
+  getFormatHelp,
   getFormatHint,
   idElementTypeOptions,
   needsValue,
@@ -38,9 +40,11 @@ const value = ref("");
 const format = ref("");
 const loading = ref(false);
 const errorMessage = ref<string | null>(null);
+const helpPopover = ref<InstanceType<typeof Popover> | null>(null);
 
 const isEditing = computed(() => props.element !== null);
 const canSubmit = computed(() => !needsValue(type.value) || value.value.length > 0);
+const helpItems = computed(() => getFormatHelp(type.value));
 
 watch(
   () => [visible.value, props.element] as const,
@@ -98,7 +102,17 @@ async function submit() {
       </Message>
 
       <label class="field-stack">
-        <span>Element type</span>
+        <span class="field-label-row">
+          Element type
+          <Button
+            type="button"
+            text
+            rounded
+            icon="pi pi-question-circle"
+            aria-label="Show formatting help"
+            @click="helpPopover?.toggle($event)"
+          />
+        </span>
         <Select
           v-model="type"
           :options="idElementTypeOptions"
@@ -108,13 +122,42 @@ async function submit() {
         />
       </label>
 
+      <Popover ref="helpPopover">
+        <div class="help-popover">
+          <strong>{{ getFormatHint(type) }}</strong>
+          <ul>
+            <li v-for="item in helpItems" :key="item">{{ item }}</li>
+          </ul>
+        </div>
+      </Popover>
+
       <label v-if="needsValue(type)" class="field-stack">
-        <span>Value</span>
+        <span class="field-label-row">
+          Value
+          <Button
+            type="button"
+            text
+            rounded
+            icon="pi pi-question-circle"
+            aria-label="Show value help"
+            @click="helpPopover?.toggle($event)"
+          />
+        </span>
         <InputText v-model="value" />
       </label>
 
       <label v-if="supportsFormat(type)" class="field-stack">
-        <span>Format</span>
+        <span class="field-label-row">
+          Format
+          <Button
+            type="button"
+            text
+            rounded
+            icon="pi pi-question-circle"
+            aria-label="Show format help"
+            @click="helpPopover?.toggle($event)"
+          />
+        </span>
         <InputText v-model="format" :placeholder="getFormatHint(type)" />
         <small class="muted">{{ getFormatHint(type) }}</small>
       </label>

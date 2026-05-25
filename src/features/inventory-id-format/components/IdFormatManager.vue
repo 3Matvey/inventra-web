@@ -36,6 +36,7 @@ const loading = ref(false);
 const previewLoading = ref(false);
 const errorMessage = ref<string | null>(null);
 const draggableElements = ref<InventoryIdFormatElementDto[]>([]);
+const discardedElements = ref<InventoryIdFormatElementDto[]>([]);
 
 const orderedElements = computed(() => sortIdElements(props.inventory.idFormatElements));
 const canAddElement = computed(() => orderedElements.value.length < recommendedMaxIdElements);
@@ -91,6 +92,18 @@ async function deleteElement(element: InventoryIdFormatElementDto) {
   }
 }
 
+async function deleteDroppedElement() {
+  const [element] = discardedElements.value;
+  if (!element) return;
+
+  discardedElements.value = [];
+  await deleteElement(element);
+
+  if (errorMessage.value) {
+    draggableElements.value = [...orderedElements.value];
+  }
+}
+
 async function moveElement(element: InventoryIdFormatElementDto, direction: -1 | 1) {
   const nextOrder = orderedElements.value.map((current) => current.id);
   const index = nextOrder.indexOf(element.id);
@@ -117,6 +130,8 @@ async function moveElement(element: InventoryIdFormatElementDto, direction: -1 |
 }
 
 async function saveDraggedOrder() {
+  if (discardedElements.value.length > 0) return;
+
   const nextOrder = draggableElements.value.map((element) => element.id);
   const currentOrder = orderedElements.value.map((element) => element.id);
   if (nextOrder.join("|") === currentOrder.join("|")) return;
@@ -162,6 +177,7 @@ watch(() => props.inventory.id, loadPreview);
       v-model="draggableElements"
       class="definition-list"
       handle=".drag-handle"
+      :group="{ name: 'id-format-elements' }"
       :animation="180"
       ghost-class="drag-ghost"
       @end="saveDraggedOrder"
@@ -210,6 +226,23 @@ watch(() => props.inventory.id, loadPreview);
       <Message v-if="draggableElements.length === 0" severity="warn" :closable="false">
         {{ t("idFormat.empty") }}
       </Message>
+    </VueDraggable>
+
+    <VueDraggable
+      v-model="discardedElements"
+      class="drag-delete-zone"
+      :group="{ name: 'id-format-elements' }"
+      :sort="false"
+      :animation="180"
+      @add="deleteDroppedElement"
+    >
+      <div class="drag-delete-zone-content">
+        <i class="pi pi-trash" aria-hidden="true" />
+        <div>
+          <strong>Drop here to remove</strong>
+          <span class="muted">Drag a Custom ID element outside the format list to delete it.</span>
+        </div>
+      </div>
     </VueDraggable>
 
     <IdFormatElementDialog
