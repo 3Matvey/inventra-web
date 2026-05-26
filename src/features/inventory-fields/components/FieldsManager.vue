@@ -8,7 +8,7 @@ import { getInventoryDetails, removeInventoryField, reorderInventoryFields } fro
 import type { InventoryDetailsDto, InventoryFieldDefinitionDto } from "@/entities/inventory/types";
 import { getFieldTypeLabel } from "@/entities/inventory/utils";
 import { useI18n } from "@/shared/i18n/useI18n";
-import { fieldTypeOptions, maxFieldsPerType, countFieldsByType } from "../model/fieldLimits";
+import { fieldTypeOptions, countFieldsByType } from "../model/fieldLimits";
 import FieldEditorDialog from "./FieldEditorDialog.vue";
 
 const props = defineProps<{
@@ -120,7 +120,7 @@ async function saveDraggedOrder() {
     <div class="section-heading">
       <div>
         <h2>{{ t("fields.title") }}</h2>
-        <span class="muted">{{ t("fields.limit", { count: maxFieldsPerType }) }}</span>
+        <span class="muted">{{ t("fields.unlimited") }}</span>
       </div>
       <Button icon="pi pi-plus" :label="t('fields.add')" :disabled="loading" @click="openCreate" />
     </div>
@@ -129,7 +129,7 @@ async function saveDraggedOrder() {
       <Tag
         v-for="option in fieldTypeOptions"
         :key="option.value"
-        :value="`${option.label}: ${countFieldsByType(inventory.fields, option.value)}/${maxFieldsPerType}`"
+        :value="`${option.label}: ${countFieldsByType(inventory.fields, option.value)}`"
         severity="secondary"
       />
     </div>

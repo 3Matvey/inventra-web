@@ -13,7 +13,7 @@ import type {
   InventoryFieldType
 } from "@/entities/inventory/types";
 import { addInventoryField, updateInventoryField } from "@/entities/inventory/api";
-import { canAddFieldType, defaultFieldType, fieldTypeOptions } from "../model/fieldLimits";
+import { defaultFieldType, fieldTypeOptions } from "../model/fieldLimits";
 
 const visible = defineModel<boolean>("visible", { required: true });
 
@@ -34,10 +34,7 @@ const loading = ref(false);
 const errorMessage = ref<string | null>(null);
 
 const isEditing = computed(() => props.field !== null);
-const canSubmit = computed(() => {
-  if (!title.value.trim()) return false;
-  return isEditing.value || canAddFieldType(props.inventory.fields, type.value);
-});
+const canSubmit = computed(() => Boolean(title.value.trim()));
 
 watch(
   () => [visible.value, props.field] as const,
@@ -107,10 +104,6 @@ async function submit() {
           :disabled="isEditing"
         />
       </label>
-
-      <Message v-if="!isEditing && !canAddFieldType(inventory.fields, type)" severity="warn" :closable="false">
-        This inventory already has 3 fields of this type.
-      </Message>
 
       <label class="field-stack">
         <span>Title</span>

@@ -69,7 +69,7 @@
   "items.exportExcel": "Excel",
   "items.selected": "selected",
   "fields.title": "Custom fields",
-  "fields.limit": "Up to {count} fields per type",
+  "fields.unlimited": "Any number of fields of any type",
   "fields.add": "Add field",
   "fields.empty": "No custom fields configured yet.",
   "idFormat.title": "Custom ID format",
