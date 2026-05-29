@@ -37,6 +37,7 @@ import ItemCreateDialog from "@/features/item-editor/components/ItemCreateDialog
 import ItemEditorDialog from "@/features/item-editor/components/ItemEditorDialog.vue";
 import { useI18n } from "@/shared/i18n/useI18n";
 import { useCurrentUserStore } from "@/entities/user/stores/currentUser";
+import { useSupportTicketStore } from "@/features/support-ticket/model/supportTicketStore";
 
 const props = defineProps<{
   inventoryId: string;
@@ -45,6 +46,7 @@ const props = defineProps<{
 const { t } = useI18n();
 const router = useRouter();
 const currentUser = useCurrentUserStore();
+const supportTicket = useSupportTicketStore();
 const inventory = ref<InventoryDetailsDto | null>(null);
 const statistics = ref<InventoryStatisticsDto | null>(null);
 const items = ref<InventoryItemTableRowDto[]>([]);
@@ -87,6 +89,7 @@ async function loadInventory() {
     ]);
 
     inventory.value = details;
+    supportTicket.setInventoryContext(details.id, details.title);
     statistics.value = stats;
     await loadItems();
   } catch (error) {

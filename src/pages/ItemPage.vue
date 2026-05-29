@@ -9,6 +9,7 @@ import type { InventoryItemDetailsDto } from "@/entities/item/types";
 import ItemDetailsPanel from "@/features/item-details/components/ItemDetailsPanel.vue";
 import ItemEditorDialog from "@/features/item-editor/components/ItemEditorDialog.vue";
 import { useCurrentUserStore } from "@/entities/user/stores/currentUser";
+import { useSupportTicketStore } from "@/features/support-ticket/model/supportTicketStore";
 
 const props = defineProps<{
   itemId: string;
@@ -16,6 +17,7 @@ const props = defineProps<{
 
 const router = useRouter();
 const currentUser = useCurrentUserStore();
+const supportTicket = useSupportTicketStore();
 const item = ref<InventoryItemDetailsDto | null>(null);
 const inventory = ref<InventoryDetailsDto | null>(null);
 const loading = ref(true);
@@ -44,6 +46,7 @@ async function loadItem() {
   try {
     item.value = await getItemDetails(props.itemId);
     inventory.value = await getInventoryDetails(item.value.inventoryId);
+    supportTicket.setInventoryContext(inventory.value.id, inventory.value.title);
   } catch (error) {
     errorMessage.value = error instanceof Error ? error.message : "Failed to load item.";
   } finally {

@@ -10,6 +10,7 @@ const apiProxyRoutes = [
   "/categories",
   "/tags",
   "/users",
+  "/support",
   "/admin",
   "/uploads",
   "/signin-google",

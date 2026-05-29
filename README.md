@@ -1,4 +1,4 @@
-# .
+# Inventra Web
 
 This template should help get you started developing with Vue 3 in Vite.
 
@@ -35,8 +35,13 @@ npm install
 npm run dev
 ```
 
+The development mode serves the frontend locally at `/` and proxies API requests to the configured backend from `.env.development`.
+This lets you check UI changes locally before deploying the static build.
+
 ### Type-Check, Compile and Minify for Production
 
 ```sh
 npm run build
 ```
+
+Production settings live in `.env`; keep `VITE_APP_BASE=/inventra-web/` there for the deployed Raspberry Pi path.
